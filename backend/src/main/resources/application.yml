@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: shopeasy-backend
+
+  datasource:
+    url: jdbc:h2:mem:shopeasy;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ''
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: update        # use 'validate' in production
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+server:
+  port: ${PORT:8080}
+
+# ── JWT ───────────────────────────────────────────────────────────
+jwt:
+  secret: ${JWT_SECRET:dGhlLXF1aWNrLWJyb3duLWZveC1qdW1wcy1vdmVyLXRoZS1sYXp5LWRvZw==}
+  access-token-expiry-ms:  900000      # 15 minutes
+  refresh-token-expiry-ms: 604800000   # 7 days
+
+# ── CORS ──────────────────────────────────────────────────────────
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:3000}
+
+# ── AI Service ────────────────────────────────────────────────────
+ai:
+  service-url: ${AI_SERVICE_URL:http://localhost:8000}
+
+# ── Pagination Defaults ───────────────────────────────────────────
+app:
+  pagination:
+    default-page-size: 12
+    max-page-size: 50
+
+# ── Swagger / OpenAPI ─────────────────────────────────────────────
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+# ── Logging ───────────────────────────────────────────────────────
+logging:
+  level:
+    root: INFO
+    com.shopeasy: DEBUG
+    org.springframework.security: INFO

@@ -1,0 +1,47 @@
+// ── Roles ─────────────────────────────────────────────────────────────────────
+export const ROLES = {
+  USER:   'USER',
+  VENDOR: 'VENDOR',
+  ADMIN:  'ADMIN',
+};
+
+// ── Order Statuses ────────────────────────────────────────────────────────────
+export const ORDER_STATUSES = [
+  'PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED',
+];
+
+// ── Sort Options ──────────────────────────────────────────────────────────────
+export const SORT_OPTIONS = [
+  { value: 'createdAt,desc',  label: 'Newest First'      },
+  { value: 'price,asc',       label: 'Price: Low → High' },
+  { value: 'price,desc',      label: 'Price: High → Low' },
+  { value: 'ratingAvg,desc',  label: 'Best Rated'        },
+  { value: 'ratingCount,desc',label: 'Most Reviewed'     },
+];
+
+// ── Payment Methods ───────────────────────────────────────────────────────────
+export const PAYMENT_METHODS = [
+  { id: 'CARD',   label: 'Credit / Debit Card', icon: '💳' },
+  { id: 'UPI',    label: 'UPI',                 icon: '📱' },
+  { id: 'BANK',   label: 'Net Banking',         icon: '🏦' },
+  { id: 'WALLET', label: 'Wallet',              icon: '💰' },
+];
+
+// ── Shipping Options ──────────────────────────────────────────────────────────
+export const SHIPPING_OPTIONS = [
+  { id: 'STANDARD', label: 'Standard',  desc: '5-7 business days', price: 0,   threshold: 999 },
+  { id: 'EXPRESS',  label: 'Express',   desc: '2-3 business days', price: 299, threshold: null },
+  { id: 'OVERNIGHT',label: 'Overnight', desc: 'Next day delivery', price: 599, threshold: null },
+];
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+export const DEFAULT_PAGE_SIZE = 12;
+
+// ── Local Storage Keys ────────────────────────────────────────────────────────
+export const LS_KEYS = {
+  ACCESS_TOKEN:  'accessToken',
+  REFRESH_TOKEN: 'refreshToken',
+  CART:          'shopeasy_cart',
+  WISHLIST:      'shopeasy_wishlist',
+  THEME:         'shopeasy_theme',
+};

@@ -1,0 +1,3 @@
+#!/bin/sh
+DIRNAME="$(dirname "$0")"
+java "-Dmaven.multiModuleProjectDirectory=$DIRNAME" -cp "$DIRNAME/.mvn/wrapper/maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain "$@"
