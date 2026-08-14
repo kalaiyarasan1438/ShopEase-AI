@@ -29,7 +29,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update        # use 'validate' in production
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}        # use 'validate' in production
     show-sql: false
     open-in-view: false
     properties:
