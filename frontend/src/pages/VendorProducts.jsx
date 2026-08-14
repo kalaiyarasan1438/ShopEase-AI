@@ -6,10 +6,13 @@ import toast from 'react-hot-toast';
 import api from '@services/api';
 import { formatCurrency, formatDate } from '@utils/formatters';
 import Badge from '@components/common/Badge.jsx';
+import Pagination from '@components/common/Pagination.jsx';
 
 export default function VendorProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [deleting, setDeleting] = useState(null);
@@ -17,33 +20,36 @@ export default function VendorProducts() {
 
   // Debounce search
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(0);
+    }, 400);
     return () => clearTimeout(t);
   }, [search]);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ size: 100, page: 0 });
+      const params = new URLSearchParams({ size: 10, page });
       if (debouncedSearch) params.set('search', debouncedSearch);
       const res = await api.get(`/api/vendor/products?${params}`);
       setProducts(res.data.content || []);
+      setTotalPages(res.data.totalPages || 0);
     } catch {
       toast.error('Failed to load products');
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch]);
+  }, [debouncedSearch, page]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   const handleDelete = async (product) => {
-    if (!window.confirm(`Delete "${product.name}"? This cannot be undone.`)) return;
     setDeleting(product.id);
     try {
       await api.delete(`/api/vendor/products/${product.id}`);
       setProducts(prev => prev.filter(p => p.id !== product.id));
-      toast.success('Product removed successfully');
+      toast.success(`"${product.name}" removed successfully.`);
     } catch {
       toast.error('Failed to delete product');
     } finally {
@@ -167,6 +173,12 @@ export default function VendorProducts() {
           </div>
         )}
       </div>
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={(p) => setPage(p)}
+      />
 
       {/* Edit Modal */}
       {editProduct && (

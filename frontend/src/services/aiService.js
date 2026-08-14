@@ -10,13 +10,14 @@ const aiApi = axios.create({
 });
 
 const aiService = {
-  // AI chatbot message
-  sendMessage: async (message, conversationHistory = []) => {
-    const { data } = await aiApi.post('/ai/chat', {
-      message,
-      history: conversationHistory,
-    });
-    return data;
+  // Chatbot message endpoint
+  sendMessage: async (message, history = [], image = null) => {
+    try {
+      const { data } = await aiApi.post('/ai/chat', { message, history, image });
+      return data;
+    } catch {
+      return null;
+    }
   },
 
   // Personalized product recommendations

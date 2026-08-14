@@ -47,7 +47,10 @@ public class SecurityConfig {
         "/api/auth/register",
         "/api/auth/refresh",
         "/api/auth/forgot-password",
+        "/api/auth/verify-otp",
+        "/api/auth/reset-password-otp",
         "/api/auth/reset-password",
+        "/api/auth/oauth/google"
     };
 
     @Bean

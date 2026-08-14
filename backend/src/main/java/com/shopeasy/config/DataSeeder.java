@@ -31,18 +31,38 @@ public class DataSeeder implements CommandLineRunner {
     // Each product definition: {name, price, oldPrice, badge, description, category, img, thumb, g1, g2, g3}
     // All image URLs are absolute, verified CDN links.
 
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
     @Override
     @Transactional
     public void run(String... args) {
-        // Ensure admin user exists regardless of existing data
+        // Migration of existing orders and legacy emails
+        try {
+            jdbcTemplate.execute("UPDATE orders SET status = 'ORDER_PLACED' WHERE status = 'PENDING'");
+            jdbcTemplate.execute("UPDATE orders SET status = 'OUT_FOR_DELIVERY' WHERE status = 'SHIPPED'");
+            jdbcTemplate.execute("UPDATE users SET email = 'vendor@gmail.com' WHERE email = 'vendor@shopeasy.com'");
+            jdbcTemplate.execute("UPDATE users SET email = 'admin@shopeasy.in' WHERE email = 'admin@shopeasy.com'");
+            jdbcTemplate.execute("UPDATE users SET email = 'shopper@gmail.com' WHERE email = 'shopper@shopeasy.com'");
+        } catch (Exception e) {
+            log.warn("Legacy migration skipped or failed: {}", e.getMessage());
+        }
+
+        // Pre-create all application roles if missing
         Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElseGet(() ->
             roleRepository.save(Role.builder().name("ROLE_ADMIN").build())
         );
-        if (!userRepository.existsByEmail("admin@shopeasy.com")) {
+        Role vendorRole = roleRepository.findByName("ROLE_VENDOR").orElseGet(() ->
+            roleRepository.save(Role.builder().name("ROLE_VENDOR").build())
+        );
+        Role userRole = roleRepository.findByName("ROLE_USER").orElseGet(() ->
+            roleRepository.save(Role.builder().name("ROLE_USER").build())
+        );
+
+        if (!userRepository.existsByEmail("admin@shopeasy.in")) {
             User adminUser = User.builder()
                 .firstName("Admin")
                 .lastName("User")
-                .email("admin@shopeasy.com")
+                .email("admin@shopeasy.in")
                 .password(passwordEncoder.encode("Admin@123"))
                 .enabled(true)
                 .build();
@@ -51,11 +71,8 @@ public class DataSeeder implements CommandLineRunner {
             log.info("Created default admin user");
         }
 
-        // Seed products only if none exist
-        if (productRepository.count() > 0) {
-            log.info("Database already seeded with {} products — skipping product seeding.", productRepository.count());
-            return;
-        }
+        // Seed products dynamically if missing
+        log.info("Checking database product count (currently {}) against DataSeeder definitions...", productRepository.count());
 
 
         log.info("Seeding database with categories, vendors, and 100 products...");
@@ -71,18 +88,12 @@ public class DataSeeder implements CommandLineRunner {
             {"Beauty & Care", "beauty-care"},
             {"Hair & Care", "hair-care"},
         }) {
-            cats.put(c[0], categoryRepository.save(
-                Category.builder().name(c[0]).slug(c[1]).build()
+            cats.put(c[0], categoryRepository.findByName(c[0]).orElseGet(() ->
+                categoryRepository.save(Category.builder().name(c[0]).slug(c[1]).build())
             ));
         }
 
-        // Find or create roles
-        Role vendorRole = roleRepository.findByName("ROLE_VENDOR").orElseGet(() ->
-            roleRepository.save(Role.builder().name("ROLE_VENDOR").build())
-        );
-        Role userRole = roleRepository.findByName("ROLE_USER").orElseGet(() ->
-            roleRepository.save(Role.builder().name("ROLE_USER").build())
-        );
+        // ── Categories seeded ──────────────────────────────────────────────────
 
         // ── Duplicate role and admin user creation block removed (handled earlier) ──────────────────────────
 
@@ -91,11 +102,11 @@ public class DataSeeder implements CommandLineRunner {
         if (existingVendor.isPresent()) {
             vendor = existingVendor.get();
         } else {
-            User vendorUser = userRepository.findByEmail("vendor@shopeasy.com").orElseGet(() -> {
+            User vendorUser = userRepository.findByEmail("vendor@gmail.com").orElseGet(() -> {
                 User u = User.builder()
                     .firstName("TechWave")
                     .lastName("Store")
-                    .email("vendor@shopeasy.com")
+                    .email("vendor@gmail.com")
                     .password(passwordEncoder.encode("Vendor@123"))
                     .enabled(true)
                     .build();
@@ -129,7 +140,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://tapwell.in/wp-content/uploads/2025/01/WhatsApp-Image-2025-06-11-at-5.49.08-PM-1.jpeg"
         });
 
-        defs.add(new String[]{"Smart Watch Ultra", "24999", "34999", "Hot Deal",
+        defs.add(new String[]{"Smart Watch Ultra", "4999", "6999", "Hot Deal",
             "Advanced health tracking, GPS, AMOLED display, 7-day battery",
             "Electronics",
             "https://celltophone.com/wp-content/uploads/2025/01/T900-Ultra-Smart-Watch.webp",
@@ -212,11 +223,12 @@ public class DataSeeder implements CommandLineRunner {
         defs.add(new String[]{"Noise Cancelling Earbuds", "9999", "13999", "Best Seller",
             "Active noise cancellation, spatial audio, wireless charging case",
             "Electronics",
-            "https://i.pcmag.com/imagery/roundups/02jmWgahGc1kOlR6u4u2Q9g-13..v1727913632.jpg",
-            "https://uniquehubindia.in/cdn/shop/files/5.png?v=1776715672&width=1445",
-            "https://uniquehubindia.in/cdn/shop/files/5.png?v=1776715672&width=1445",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsL3zObrlVObByX6IihzrLpAqWcyTVHmfKD-gz49a3xT2pVVRQZteMq3JJ&s=10",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsL3zObrlVObByX6IihzrLpAqWcyTVHmfKD-gz49a3xT2pVVRQZteMq3JJ&s=10"
+            "https://assets.myntassets.com/w_412,q_50,,dpr_3,fl_progressive,f_webp/assets/images/2025/AUGUST/14/sKniryxf_c0c880e26c1046459f591fef36bd0f94.jpg",
+            "https://img.tatacliq.com/images/i23//1348Wx2000H/MP000000025829168_1348Wx2000H_202503271048081.jpeg",
+            "https://m.media-amazon.com/images/I/613-YiH908L._AC_UF1000,1000_QL80_.jpg",
+            "https://media.tatacroma.com/Croma%20Assets/Entertainment/Headphones%20and%20Earphones/Images/312439_1_ey3rxh.png",
+            "https://www.unboxify.in/cdn/shop/files/B0DGV56J6G_1.jpg?v=1768477722"
+
         });
 
         defs.add(new String[]{"Portable SSD 1TB", "7499", "10999", null,
@@ -340,7 +352,7 @@ public class DataSeeder implements CommandLineRunner {
         // FASHION (18 products)
         // ═══════════════════════════════════════════════════════════════
 
-        defs.add(new String[]{"Premium Leather Jacket", "15999", "21499", "Best Seller",
+        defs.add(new String[]{"Premium Leather Jacket", "999", "1099", "Best Seller",
             "Genuine lambskin leather, slim fit, satin lining",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEu-_JrOxyiu_6Q6ONgXkqzPVrPPpbZ0rh6MKOMs92-AGpQWJ7fcDSxKY&s=10",
@@ -350,7 +362,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://images.stockcake.com/public/9/c/9/9c980813-71e7-407d-89a2-af96260c86fb_large/stylish-leather-jacket-stockcake.jpg"
         });
 
-        defs.add(new String[]{"Classic Denim Jeans", "5499", "7499", null,
+        defs.add(new String[]{"Classic Denim Jeans", "3499", "5499", null,
             "Slim fit, stretch denim, mid-rise, dark wash",
             "Fashion",
             "https://m.media-amazon.com/images/I/711qgP-l4KL._AC_UY1100_.jpg",
@@ -360,7 +372,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://jimmyluxury.in/cdn/shop/files/IMG_8248copy_81e3efbe-9c62-4032-a634-8edaf5016224.jpg?v=1765434729&width=2048"
         });
 
-        defs.add(new String[]{"Cotton Oxford Shirt", "3999", "5999", "New",
+        defs.add(new String[]{"Cotton Oxford Shirt", "999", "1999", "New",
             "100% premium cotton, button-down collar, regular fit",
             "Fashion",
             "https://www.urbanofashion.com/cdn/shop/files/shirtsolregoxf-05-white-1_41b56b72-ebde-439d-afe0-202b5d10559c.jpg?v=1774711491",
@@ -370,7 +382,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgTQf4oE_hoHfZ82XheyyCFOkxfZThtRm7fYbqvy6OeCaAye2E0ltZ1pGK&s=10"
         });
 
-        defs.add(new String[]{"Cashmere Blend Sweater", "10999", "14999", null,
+        defs.add(new String[]{"Cashmere Blend Sweater", "999", "1999", null,
             "Soft cashmere-wool blend, crew neck, ribbed cuffs",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf5Htk7nwYYotCpYvTyQxel7-sQxf1jiCbV0YbHRT_M8sf4Iz0uZmNub7D&s=10",
@@ -380,7 +392,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOvLSjtPHRza1at_MbwSzXTKaWwmPXJ8KNZ4rCn3WbQg&s=10"
         });
 
-        defs.add(new String[]{"Running Sneakers Ultra", "11999", "16999", "Hot Deal",
+        defs.add(new String[]{"Running Sneakers Ultra", "1599", "1699", "Hot Deal",
             "Responsive cushioning, breathable mesh, lightweight design",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQICjjwmiiF-YupgFt_6Jmm9QrFF1JEv9iHuP3TakK0T34D0KTGV775WF0&s=10",
@@ -390,7 +402,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPFR2j6i-vT2o-5T2byngAntoGEaf6nqPtI9zBaiPvi63h7RsA9Nclfow&s=10"
         });
 
-        defs.add(new String[]{"Silk Tie Collection", "2999", "4999", null,
+        defs.add(new String[]{"Silk Tie Collection", "999", "1999", null,
             "100% mulberry silk, hand-stitched, classic patterns",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRapsFbBT0LbVSAj4Ay7Pjym7se5Xtq0-kYE02ajn4rYPJfsy2SoQtT4lcl&s=10",
@@ -400,7 +412,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://foxandchave.com/cdn/shop/files/45-803-Morris-Tulip-Pink-01-web.jpg?v=1776460798&width=533"
         });
 
-        defs.add(new String[]{"Wool Overcoat Classic", "21499", "29999", "Best Seller",
+        defs.add(new String[]{"Wool Overcoat Classic", "2499", "2699", "Best Seller",
             "Italian wool, double-breasted, satin lining, tailored fit",
             "Fashion",
             "https://frenchcrown.in/cdn/shop/files/TCB2912-DB-D1_1.jpg?v=1700646867&width=3500",
@@ -410,7 +422,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIKQewMlV1igw9HCjQoJlLs3QnNzxxJ5gFZakxLIA9ycgHVQVK_-8E86bQ&s=10"
         });
 
-        defs.add(new String[]{"Canvas Tote Bag", "2499", "3999", "New",
+        defs.add(new String[]{"Canvas Tote Bag", "499", "799", "New",
             "Organic cotton canvas, reinforced handles, inner pocket",
             "Fashion",
             "https://www.thesparklestory.in/cdn/shop/files/PersonalizedCanvasToteBag-CODNotApplicable_800x.jpg?v=1718618153",
@@ -420,7 +432,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://www.handmakers.in/cdn/shop/products/20221223_123218.jpg?v=1672482368&width=1946"
         });
 
-        defs.add(new String[]{"Aviator Sunglasses", "6499", "9999", null,
+        defs.add(new String[]{"Aviator Sunglasses", "499", "999", null,
             "Polarized lenses, titanium frame, UV400 protection",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGTrIYHgz1lRmFQReV0GAliAeMI7m22N7QydQI3bXUuUQzmko1wFDeQD4&s=10",
@@ -430,7 +442,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://m.media-amazon.com/images/I/819KtKJ-ogL._AC_UY350_.jpg"
         });
 
-        defs.add(new String[]{"Leather Belt Premium", "3499", "5499", null,
+        defs.add(new String[]{"Leather Belt Premium", "799", "899", null,
             "Full-grain leather, reversible, brushed steel buckle",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDRRZBWmSHkgpZCq6dqS6UEsnYi2tXUrHf5WjfRizOB7uRSzsx_uvc5Ys&s=10",
@@ -440,7 +452,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6igLMJmzl5DfDuZZrI6Vse96gG8QRECq9w_84oeZcMpNiw5UxVwd2fKg&s=10"
         });
 
-        defs.add(new String[]{"Linen Summer Dress", "7499", "9999", "Hot Deal",
+        defs.add(new String[]{"Linen Summer Dress", "799", "999", "Hot Deal",
             "100% linen, A-line silhouette, side pockets",
             "Fashion",
             "https://i.etsystatic.com/9617243/r/il/5d689d/2888023023/il_570xN.2888023023_h4zp.jpg",
@@ -450,7 +462,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyhD8KVp44JmkWuzV1ceAaA5Tw-Ui7EheBnGX1Zz2sgn4IRKD1xnhm9QVg&s=10"
         });
 
-        defs.add(new String[]{"Merino Wool Socks 6-Pack", "2499", "3999", null,
+        defs.add(new String[]{"Merino Wool Socks 6-Pack", "999", "1999", null,
             "Temperature regulating, moisture wicking, cushioned sole",
             "Fashion",
             "https://m.media-amazon.com/images/I/71YmO7mbMDL.jpg",
@@ -460,7 +472,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://m.media-amazon.com/images/S/aplus-media-library-service-media/4ac6412b-0d26-4607-9175-2a628182802b.__CR44,0,2528,1896_PT0_SX600_V1___.jpg"
         });
 
-        defs.add(new String[]{"Waterproof Parka Jacket", "13499", "18999", "New",
+        defs.add(new String[]{"Waterproof Parka Jacket", "3499", "5999", "New",
             "3-layer waterproof shell, sealed seams, removable hood",
             "Fashion",
             "https://m.media-amazon.com/images/I/71AtYUkPBRL._AC_UY1100_.jpg",
@@ -470,7 +482,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://www.gooutdoors.co.uk/cdn/shop/files/go_767478_a_8a5dfa4d-b8af-4d82-bfa0-e7e60081f72e.jpg?v=1775122908&width=4000"
         });
 
-        defs.add(new String[]{"Stretch Chino Pants", "4999", "6999", null,
+        defs.add(new String[]{"Stretch Chino Pants", "1999", "1399", null,
             "Slim fit, stretch cotton blend, 8 color options",
             "Fashion",
             "https://www.tbase.in/cdn/shop/files/2_a74d06d5-6dd4-4916-9bb1-9a1707efd0d0.jpg?v=1742818485&width=2400",
@@ -480,7 +492,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHkxXjz1x26C-lPPdMlw-Y4UL3D0tAjxA6lJ2zFfTGEg&s=10"
         });
 
-        defs.add(new String[]{"Pima Cotton Polo Shirt", "3499", "4999", "Best Seller",
+        defs.add(new String[]{"Pima Cotton Polo Shirt", "899", "999", "Best Seller",
             "Pima cotton pique, contrast collar, relaxed fit",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT131iuhayZu8K_IsApyqxCq8oqvAn1c9MgPt3kUNeI0Q&s=10",
@@ -490,7 +502,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnXsYsxTQCMGvxc6zTTo_gyrKziIMrlNvRcivJv0U1sw&s=10"
         });
 
-        defs.add(new String[]{"Leather Messenger Bag", "8499", "12999", null,
+        defs.add(new String[]{"Leather Messenger Bag", "899", "999", null,
             "Full-grain leather, padded laptop sleeve, adjustable strap",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQhSvnVcBgGhQdM36ppDfSrcMEX8CsdZudPBp-kd9g05iERRiOK0uxAdqR&s=10",
@@ -500,7 +512,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9IxczVzfEVd00CT-_zAIclS2QSr1XY6kTf7fqXHqnYmv_D3abXd8N3ecw&s=10"
         });
 
-        defs.add(new String[]{"Bamboo Fiber T-Shirt", "1999", "2999", "New",
+        defs.add(new String[]{"Bamboo Fiber T-Shirt", "999", "1999", "New",
             "Eco-friendly bamboo fabric, ultra-soft, anti-bacterial",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM7ATEcq9xhtEdJIccx3kI-o3myZAqmd5xffy44fUBe2uJ7BU9jBPBpO0&s=10",
@@ -510,7 +522,17 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaelfhiBletLe3g4dU7GmNdPODWHOq0VVmWuDHvzl0Mw&s=10"
         });
 
-        defs.add(new String[]{"Suede Chelsea Boots", "12999", "16999", "Hot Deal",
+        defs.add(new String[]{"Blue Denim Jeans", "1500", "1699", "New",
+            "Classic fit blue denim jeans for everyday wear",
+            "Fashion",
+            "https://wrogn.com/cdn/shop/files/1_4eb49f58-8131-4749-b63b-2a3573424b64.jpg?v=1749124959",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwyJ7cgFannN_ljrGTaQCHC2MuwzSBRPfM0esjlVTeRP9RH8jBnWNuf-Co&s=10",
+            "https://assets.ajio.com/medias/sys_master/root1/20250731/n2CZ/688b52a38bfb9009ac50387a/-1117Wx1400H-702048169-blue-MODEL.jpg"
+        });
+
+        
+
+        defs.add(new String[]{"Suede Chelsea Boots", "2999", "4999", "Hot Deal",
             "Italian suede, Goodyear welt, crepe rubber sole",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3hlNvflgNiySD2zMW7790Nl_b4xdc6hbXwx1E89yu00xvZaUzplEQ_r4&s=10",
@@ -519,7 +541,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXGFsFyy68rXLaKX7RiOv4vLQL6KOGnAS_HEpZ5IKr3Q&s=10",
             "https://assets.myntassets.com/h_1440,q_75,w_1080/v1/assets/images/31638435/2024/11/23/b9aec0d1-92ae-4506-8359-1876fc54f9231732335370999-Styli-Men-Faux-Suede-Chelsea-Boots-8691732335370668-1.jpg"
         });
-        defs.add(new String[]{"Gold Plated Jhumka Earrings", "1299", "1999", "Best Seller",
+        defs.add(new String[]{"Gold Plated Jhumka Earrings", "299", "499", "Best Seller",
             "Traditional gold-plated jhumka earrings with elegant ethnic design",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFvTudr0FZjw17UU44f1o8TEUyjl636aqGbkdxG99iDeBjqrfbpM54RJw&s=10",
@@ -527,7 +549,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://m.media-amazon.com/images/I/91xTw1aq5LL._AC_UY1100_.jpg"
     });
 
-    defs.add(new String[]{"American Diamond Necklace Set", "2499", "3999", "Hot Deal",
+    defs.add(new String[]{"American Diamond Necklace Set", "899", "999", "Hot Deal",
             "Premium American diamond necklace set with matching earrings",
             "Fashion",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGM2AsOAqP_e5qb4Z1qQZBVScOl3BqInHxRAYO0gxSokQGz5xP8zg1JGI&s=10",
@@ -544,7 +566,7 @@ public class DataSeeder implements CommandLineRunner {
     });
 
 
-    defs.add(new String[]{"Rose Gold Bracelet for Women", "1499", "2299", null,
+    defs.add(new String[]{"Rose Gold Bracelet for Women", "799", "999", null,
             "Elegant rose gold bracelet with premium crystal finish",
             "Fashion",
             "https://m.media-amazon.com/images/I/71NbkTQGTML.jpg",
@@ -552,7 +574,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfAfMkMMIwJ5wvNemX6eRGV-uCiy97sY9Bbr5xeXMIaHplRVHfcefsdap1&s=10"
     });
 
-    defs.add(new String[]{"Pearl Drop Jhumka Earrings", "899", "1499", "Trending",
+    defs.add(new String[]{"Pearl Drop Jhumka Earrings", "499", "599", "Trending",
             "Beautiful pearl drop jhumka earrings for festive occasions",
             "Fashion",
             "https://www.adorebypriyanka.com/cdn/shop/products/WhatsAppImage2022-12-20at6.00.44PM_2.jpg?v=1747566262&width=1080",
@@ -564,7 +586,7 @@ public class DataSeeder implements CommandLineRunner {
         // SPORTS (16 products)
         // ═══════════════════════════════════════════════════════════════
 
-        defs.add(new String[]{"Yoga Mat Premium", "2999", "4999", "Best Seller",
+        defs.add(new String[]{"Yoga Mat Premium", "999", "1999", "Best Seller",
             "6mm thick, non-slip, eco-friendly TPE, carrying strap",
             "Sports",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQboCEblbx_R7TNf6jCXog_Ccv-e88VRLoRlRXG_ZvhXBKc9M3pfe5BoPA&s=10",
@@ -604,7 +626,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://i5.walmartimages.com/seo/ProsourceFit-Tube-Resistance-Bands-Set-w-Attached-Handles-for-Fitness_e9dae7c4-3966-462e-86ce-849eb8b2a075.a698431768a89e4377ec143cdb82d89e.jpeg"
         });
 
-        defs.add(new String[]{"Trail Running Shoes", "10999", "14499", null,
+        defs.add(new String[]{"Trail Running Shoes", "1999", "1499", null,
             "Vibram outsole, waterproof Gore-Tex, responsive cushion",
             "Sports",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi_h-P-PO0N4vgUe-0E7eGj8FAqMqozjE0GVv9IINjEQyGTICMkRNHSrY&s=10",
@@ -614,7 +636,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://cdn.mos.cms.futurecdn.net/QxyTSpbo2jtAFXaKYJ7JYa.jpg"
         });
 
-        defs.add(new String[]{"Smart Jump Rope", "2499", "4499", "New",
+        defs.add(new String[]{"Smart Jump Rope", "2499", "3499", "New",
             "LCD counter, adjustable length, ball bearing handle",
             "Sports",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM8vQgEUq_EINmaWYh8u9qx2v2Sf9fI15TfEIBSi8ZK7mAP6ynuyspGzGi&s=10",
@@ -624,7 +646,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://m.media-amazon.com/images/I/614NGooDuZL._AC_UF350,350_QL80_.jpg"
         });
 
-        defs.add(new String[]{"Insulated Water Bottle", "2499", "3999", null,
+        defs.add(new String[]{"Insulated Water Bottle", "1499", "2999", null,
             "Vacuum insulated, 32oz, keeps cold 24hrs hot 12hrs",
             "Sports",
             "https://www.thinkitchen.in/cdn/shop/files/ZK141-304.jpg?v=1689160458",
@@ -634,7 +656,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBgm4c4Gm7hJrOedM4WqKk2okVztOM_x7PpMCbgskEoA&s=10"
         });
 
-        defs.add(new String[]{"Compression Shorts Pro", "2999", "4499", "Best Seller",
+        defs.add(new String[]{"Compression Shorts Pro", "999", "1999", "Best Seller",
             "4-way stretch, moisture management, flatlock seams",
             "Sports",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT35sJUdxK5KUwUOhcWj6-eC_eeKGwP9lQnjOqNQs4GIiDuz7ePlTAmmms&s=10",
@@ -644,7 +666,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://rukminim2.flixcart.com/image/180/240/xif0q/short/x/m/x/m-men-s-compression-sports-shorts-half-tights-ninq-original-imahgjerskhk4ks3.jpeg?q=90"
         });
 
-        defs.add(new String[]{"Swimming Goggles Elite", "1499", "2499", null,
+        defs.add(new String[]{"Swimming Goggles Elite", "499", "599", null,
             "Anti-fog, UV protection, adjustable nose bridge",
             "Sports",
             "https://speedo.com.au/dw/image/v2/BDFS_PRD/on/demandware.static/-/Sites-speedo-master-catalog/default/dw5e30f3a7/images/8_12818/8_12818002BST_2.jpg?sw=800&sh=800",
@@ -654,7 +676,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThjf8_QE4afXQz2n-R6mr4sLDRCs65x0qFse1CuegdqymQ584_3yIGkbVP&s=10"
         });
 
-        defs.add(new String[]{"Foam Roller Recovery", "1999", "3499", "New",
+        defs.add(new String[]{"Foam Roller Recovery", "999", "1999", "New",
             "High-density EVA foam, textured surface, 18-inch",
             "Sports",
             "https://m.media-amazon.com/images/I/61Lh5jbBwdL._AC_UF1000,1000_QL80_.jpg",
@@ -664,7 +686,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTt6x8ksu7iygHL7NQw0Z60-Q8njL1dceV20u6DGdWs3WhsSqs-uAwOTww&s=10"
         });
 
-        defs.add(new String[]{"Boxing Gloves 12oz", "3999", "5999", null,
+        defs.add(new String[]{"Boxing Gloves 12oz", "2999", "4999", null,
             "Genuine leather, multi-layer foam, wrist support",
             "Sports",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdbMa7roNYt7s8ggPXG2yCCjyEk3c988yJEDaU9pi3jQ&s=10",
@@ -674,7 +696,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTSIHU_4blohJmC_2bGamy2MC15MtGMZWnc4UkwwON1NtyAeVQfe4J-eKy&s=10"
         });
 
-        defs.add(new String[]{"Hiking Backpack 40L", "7499", "10999", "Hot Deal",
+        defs.add(new String[]{"Hiking Backpack 40L", "3499", "4999", "Hot Deal",
             "Waterproof, ventilated back panel, rain cover included",
             "Sports",
             "https://jainsonsumbrella.com/cdn/shop/files/25D76661-F5D3-4E39-88CC-09B41079D6B5_800x.jpg?v=1763719218",
@@ -684,7 +706,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTb79aRcc3gIfSlf_gXF-_o2_RTSqjOvSZEXu3xYFv9UsSbuZCGQDBoJL2Z&s=10"
         });
 
-        defs.add(new String[]{"Tennis Racket Carbon", "13499", "18999", null,
+        defs.add(new String[]{"Tennis Racket Carbon", "3499", "5999", null,
             "Full carbon frame, 100 sq in head, pre-strung",
             "Sports",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkgKtknjv7WVg9MuqENSlGhJPUseXVom0UPE2ThO0sWieRV0PsaySaXCQ&s=10",
@@ -694,7 +716,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYqN4rMB1xK82F5dZRVKBqT4yNDRka-lfhCyo9KolzCOs6D7-WsWrfu1g&s=10"
         });
 
-        defs.add(new String[]{"Fitness Tracker Band", "4999", "6999", "Best Seller",
+        defs.add(new String[]{"Fitness Tracker Band", "999", "1999", "Best Seller",
             "Heart rate, sleep tracking, 14-day battery, waterproof",
             "Sports",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8sKR4khyXYunEoWsVC4ob2cKc_rBDgL3ZofdDV8AGnw&s=10",
@@ -714,7 +736,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeonEadAWBr9-2_sRBuIYQq_aH3g_5ghH0lRQHKUjOWA&s=10"
         });
 
-        defs.add(new String[]{"Ski Jacket Insulated", "16999", "23999", "New",
+        defs.add(new String[]{"Ski Jacket Insulated", "6999", "7999", "New",
             "20K waterproof, Thinsulate insulation, helmet-compatible hood",
             "Sports",
             "https://www.peakperformance.com/ca/en/media/catalog/product/cache/47a61cd39417a8407e88c1f76cc311d9/article_images/G80496030/G80496030_d014b3f7a1fdb1147e48f0b35211e1fe.jpg?optimize=low&format=pjpg&auto=webp&width=1440&crop=3:4",
@@ -730,6 +752,7 @@ public class DataSeeder implements CommandLineRunner {
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdTc_YqyWmR4Hu1KHFcjoDQJ4-nFdsBXkCJ4pxPP52U41LI9jKtdXPDdJG&s=10",
         "https://www.sportsuncle.com/image/cache/catalog/images/ss/ew_master_1000-3-1200x1200.webp"
         });
+        
         defs.add(new String[]{"Leather Cricket Ball", "799", "1299", null,
         "Premium leather, hand-stitched, match quality",
         "Sports",
@@ -762,6 +785,14 @@ public class DataSeeder implements CommandLineRunner {
         // ═══════════════════════════════════════════════════════════════
         // HOME & LIVING (18 products)
         // ═══════════════════════════════════════════════════════════════
+        defs.add(new String[]{"Wooden Dining Table", "18999", "24999", "Hot Deal",
+            "Solid teak wood 6-seater dining table for home dining room",
+            "Home & Living",
+            "https://m.media-amazon.com/images/I/61eHMsgYtkL._AC_UF894,1000_QL80_.jpg",
+            "https://casagold.in/cdn/shop/files/Wide_Walnut_Luxury_Dining_Table.webp?v=1735819490&width=2048",
+            "https://ikiru.in/cdn/shop/files/buy-dining-furniture-set-modern-designed-marble-top-dining-table-with-6-wooden-chairs-for-dining-room-by-orange-tree-on-ikiru-online-store-1.jpg?v=1739205894"
+            
+        });
 
         defs.add(new String[]{"Ergonomic Office Chair", "32999", "42499", "Best Seller",
             "Mesh back, lumbar support, adjustable arms, 4D headrest",
@@ -843,7 +874,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyqLA2FKsUYie0R34eOmQRISMP6X4pSqB_9gdLfFA0XzGPAvnWPi0eJNA&s=10"
         });
 
-        defs.add(new String[]{"Smart Plug 4-Pack", "2499", "3999", "Hot Deal",
+        defs.add(new String[]{"Smart Plug 4-Pack", "499", "999", "Hot Deal",
             "WiFi, voice control, energy monitoring, scheduling",
             "Home & Living",
             "https://m.media-amazon.com/images/I/61YCBrHdbqL.jpg",
@@ -853,7 +884,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTs86s13fUCOcMEA0edfJFfixthb9K3d1UYXaUh7qrZ1TTMritWzPlaNZc&s=10"
         });
 
-        defs.add(new String[]{"Espresso Machine Pro", "22999", "32499", null,
+        defs.add(new String[]{"Espresso Machine Pro", "7999", "8499", null,
             "15-bar pump, milk frother, PID temperature control",
             "Home & Living",
             "https://sipologie.in/cdn/shop/files/IMG_8193-8.jpg?v=1778832319&width=2000",
@@ -1105,7 +1136,7 @@ public class DataSeeder implements CommandLineRunner {
         // Hair & CARE (10 products)
         // ═══════════════════════════════════════════════════════════════
 
-         defs.add(new String[]{"Organic Shampoo and Conditioner", "2499", "3999", null,
+         defs.add(new String[]{"Organic Shampoo and Conditioner", "1499", "1999", null,
             "Sulfate-free, plant-based, suitable for all hair types",
             "Hair & Care",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEkGsiilpaHhkW0T4m3V86OMHEAtX1l-ThsE8vmmZ_UA&s=10",
@@ -1199,7 +1230,55 @@ public class DataSeeder implements CommandLineRunner {
         // BEAUTY & CARE (14 products)
         // ═══════════════════════════════════════════════════════════════
 
-        defs.add(new String[]{"Vitamin C Serum 30ml", "1999", "3499", "Best Seller",
+        defs.add(new String[]{"Vitamin C Glow Face Serum", "399", "599", "Hot Deal",
+            "Brightening face serum with 10% Vitamin C and Niacinamide for glowing skin",
+            "Beauty & Care",
+            "https://media6.ppl-media.com/tr:h-235,w-235,c-at_max,dpr-2/static/img/product/377671/good-vibes-vitamin-c-and-b3-skin-glow-face-serum-15-ml_9_display_1760894856_0730f9bb.jpg",
+            "https://media6.ppl-media.com/tr:h-235,w-235,c-at_max,dpr-2/static/img/product/377671/good-vibes-vitamin-c-and-b3-skin-glow-face-serum-15-ml_8_display_1760894817_5c74483f.jpg",
+            "https://media6.ppl-media.com/tr:h-750,w-750,c-at_max,dpr-2,q-40/static/img/product/377671/good-vibes-vitamin-c-and-b3-skin-glow-face-serum-15-ml_8_display_1760893897_c04bcb1a.jpg"
+        });
+
+        defs.add(new String[]{"Hyaluronic Acid Hydrating Face Serum", "899", "1299", "Top Rated",
+            "Deep hydrating face serum with 2% Hyaluronic Acid for plump and smooth skin",
+            "Beauty & Care",
+            "https://images.meesho.com/images/products/514840114/ictf7_512.webp?width=512",
+            "https://fashioncolour.in/cdn/shop/files/Artboard7copy3.jpg?v=1768475979&width=1946",
+            "https://images.meesho.com/images/products/420604221/umq9g_512.webp?width=512"
+        });
+
+        defs.add(new String[]{"Casual Linen Cotton Shirt", "799", "1299", "Best Seller",
+            "Breathable lightweight casual linen cotton shirt, slim fit",
+            "Fashion",
+            "https://www.urbanofashion.com/cdn/shop/files/shirtsolregoxf-05-white-1_41b56b72-ebde-439d-afe0-202b5d10559c.jpg?v=1774711491",
+            "https://www.powerlook.in/cdn/shop/files/14017211_3_cb2d7000-07d8-4bc7-92b7-2f0f5784a050.jpg?v=1762437623",
+            "https://fyva.in/cdn/shop/files/BD0A9670.jpg?v=1761674656&width=650"
+        });
+
+        defs.add(new String[]{"Slim Fit Denim Shirt", "999", "1599", "Hot Deal",
+            "Classic blue denim shirt with dual chest pockets and button-down collar",
+            "Fashion",
+            "https://fyva.in/cdn/shop/files/BD0A9670.jpg?v=1761674656&width=650",
+            "https://www.urbanofashion.com/cdn/shop/files/shirtsolregoxf-05-white-1_41b56b72-ebde-439d-afe0-202b5d10559c.jpg?v=1774711491",
+            "https://www.powerlook.in/cdn/shop/files/14017211_3_cb2d7000-07d8-4bc7-92b7-2f0f5784a050.jpg?v=1762437623"
+        });
+
+        defs.add(new String[]{"Fitness Smart Watch Pro", "2999", "4999", "Best Seller",
+            "Smart watch with AMOLED HD display, pulse monitoring, and 100+ sports modes",
+            "Electronics",
+            "https://celltophone.com/wp-content/uploads/2025/01/T900-Ultra-Smart-Watch.webp",
+            "https://image.cdn.shpy.in/273060/1696870791388_SKU-0186_0.jpg?width=600&format=webp",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_KW6GCRe_9j3BFa3yoQB384anGZzSs_MWFaYCr1uZ-kNl8LE-tGSXcV3s&s=10"
+        });
+
+        defs.add(new String[]{"Wireless Sports Earbuds", "1499", "2999", "Hot Deal",
+            "True wireless earbuds with deep bass, IPX5 sweatproof, and 30hr playback",
+            "Electronics",
+            "https://i.pcmag.com/imagery/roundups/02jmWgahGc1kOlR6u4u2Q9g-13..v1727913632.jpg",
+            "https://uniquehubindia.in/cdn/shop/files/5.png?v=1776715672&width=1445",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsL3zObrlVObByX6IihzrLpAqWcyTVHmfKD-gz49a3xT2pVVRQZteMq3JJ&s=10"
+        });
+
+        defs.add(new String[]{"Vitamin C Serum 30ml", "999", "1999", "Best Seller",
             "20% vitamin C, hyaluronic acid, ferulic acid, brightening formula",
             "Beauty & Care",
             "https://fashioncolour.in/cdn/shop/files/Artboard7copy3.jpg?v=1768475979&width=1946",
@@ -1209,7 +1288,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://images.meesho.com/images/products/420604221/umq9g_512.webp?width=512"
         });
 
-        defs.add(new String[]{"Retinol Night Cream", "2499", "4499", "New",
+        defs.add(new String[]{"Retinol Night Cream", "199", "1299", "New",
             "0.5% retinol, peptides, anti-aging, suitable for sensitive skin",
             "Beauty & Care",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOwaUVQvsVvRCacrx20GEjJA0aY-hEeBO2JHX6ygGHnA&s=10",
@@ -1242,7 +1321,7 @@ public class DataSeeder implements CommandLineRunner {
 
        
 
-        defs.add(new String[]{"Electric Facial Cleansing Brush", "3999", "6499", "New",
+        defs.add(new String[]{"Electric Facial Cleansing Brush", "2999", "3499", "New",
             "Silicone bristles, 5 modes, IPX7 waterproof, USB-C charging",
             "Beauty & Care",
             "https://mumuso.co.in/cdn/shop/files/20240607_114918499_4442880a-3652-447d-8f2d-9ca23e6eeb8e.jpg?v=1753703937&width=1920",
@@ -1265,7 +1344,7 @@ public class DataSeeder implements CommandLineRunner {
 
        
 
-        defs.add(new String[]{"LED Face Mask Therapy", "7499", "12999", "New",
+        defs.add(new String[]{"LED Face Mask Therapy", "5499", "5999", "New",
             "7 color LED, anti-aging, acne treatment, FDA cleared",
             "Beauty & Care",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTb4IRzleE3H3B5TLh8knHqYnxF3q6z3cNsAgziauW-0w&s=10",
@@ -1275,7 +1354,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://houseofbeautyindia.com/cdn/shop/files/How_to_Use_LED_Face_Mask_for_Best_Results.jpg?v=1775050017&width=1080"
         });
 
-        defs.add(new String[]{"Cologne Discovery Set", "4999", "7499", null,
+        defs.add(new String[]{"Cologne Discovery Set", "1999", "1499", null,
             "8 premium fragrances, 10ml each, travel case included",
             "Beauty & Care",
             "https://m.media-amazon.com/images/I/51SAjaIUxLL._AC_UF1000,1000_QL80_.jpg",
@@ -1285,7 +1364,7 @@ public class DataSeeder implements CommandLineRunner {
             "https://www.dior.com/dw/image/v2/BGXS_PRD/on/demandware.static/-/Sites-master_dior/default/dw2d53b5f5/Y4001070/Y4001070_C400100392_E01_GHC.jpg?sw=800"
         });      
 
-        defs.add(new String[]{"Eye Cream Anti-Aging", "2499", "3999", "Best Seller",
+        defs.add(new String[]{"Eye Cream Anti-Aging", "999", "1999", "Best Seller",
             "Peptide complex, caffeine, reduces dark circles and puffiness",
             "Beauty & Care",
             "https://m.media-amazon.com/images/I/71NVdjBPsnL._AC_UF1000,1000_QL80_.jpg",
@@ -1395,6 +1474,9 @@ public class DataSeeder implements CommandLineRunner {
                     specs.put("Expiry", "24 Months from Manufacture");
                     break;
             }
+            if (productRepository.existsByName(name)) {
+                continue;
+            }
 
             Product p = Product.builder()
                 .name(name)
@@ -1437,21 +1519,17 @@ public class DataSeeder implements CommandLineRunner {
         if (orderRepository.count() == 0 && !products.isEmpty()) {
             log.info("Seeding sample orders for vendor analytics...");
             List<Product> saved = productRepository.findAll();
-            // Find or create a sample shopper user
-            Role userRole2 = roleRepository.findByName("ROLE_USER").orElseGet(() ->
-                roleRepository.save(Role.builder().name("ROLE_USER").build())
-            );
-            User shopper = userRepository.findByEmail("shopper@shopeasy.com").orElseGet(() -> {
+            User shopper = userRepository.findByEmail("shopper@gmail.com").orElseGet(() -> {
                 User u = User.builder()
                     .firstName("Sample").lastName("Shopper")
-                    .email("shopper@shopeasy.com")
+                    .email("shopper@gmail.com")
                     .password(passwordEncoder.encode("Shopper@123"))
                     .enabled(true).build();
-                u.getRoles().add(userRole2);
+                u.getRoles().add(userRole);
                 return userRepository.save(u);
             });
 
-            String[] statuses = {"DELIVERED","DELIVERED","SHIPPED","CONFIRMED","PENDING","CANCELLED"};
+            String[] statuses = {"DELIVERED","DELIVERED","OUT_FOR_DELIVERY","CONFIRMED","ORDER_PLACED","CANCELLED"};
             Random orderRng = new Random(99);
             for (int i = 0; i < 15; i++) {
                 Product prod = saved.get(orderRng.nextInt(saved.size()));

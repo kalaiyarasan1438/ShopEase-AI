@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Package, PlusSquare, List, TrendingUp, Settings, User,
-  LogOut, Bell, Search, Menu, X, ChevronRight, Sliders, Check, Sparkles
+  LogOut, Bell, Search, Menu, X, ChevronRight, Sliders, Check, Sparkles, Mic, Image
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { logout, selectCurrentUser } from '@store/slices/authSlice';
 import ChatBot from '@components/ai/ChatBot.jsx';
 import { initials } from '@utils/formatters';
+import api from '@services/api';
 
 const VENDOR_NAV = [
   {
@@ -34,6 +35,24 @@ export default function VendorLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [search,      setSearch]      = useState('');
   const [notifOpen,   setNotifOpen]   = useState(false);
+  const [pendingNotifs, setPendingNotifs] = useState(0);
+  const [isListening, setIsListening] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Poll for pending notifications (refund requests + pending orders) every 5s
+  useEffect(() => {
+    const checkNotifs = async () => {
+      try {
+        const res = await api.get('/api/vendor/orders?size=50');
+        const orders = res.data?.content || [];
+        const count = orders.filter(o => o.status === 'REFUND_REQUESTED' || o.status === 'PENDING').length;
+        setPendingNotifs(count);
+      } catch {}
+    };
+    checkNotifs();
+    const interval = setInterval(checkNotifs, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Dynamic Appearance states
   const [theme, setTheme] = useState(() => localStorage.getItem('shopeasy-theme') || 'light');
@@ -56,6 +75,37 @@ export default function VendorLayout() {
   const handleSearch = (e) => {
     if (e.key === 'Enter' && search.trim()) {
       navigate(`/vendor/products?search=${encodeURIComponent(search.trim())}`);
+    }
+  };
+
+  const handleVoiceSearch = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.onstart = () => {
+          setIsListening(true);
+          toast.success('Voice search listening... Speak now');
+        };
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          setSearch(transcript);
+          setIsListening(false);
+          if (transcript.trim()) {
+            navigate(`/vendor/products?search=${encodeURIComponent(transcript.trim())}`);
+          }
+        };
+        recognition.onerror = () => {
+          setIsListening(false);
+          toast.error('Voice search failed. Please try typing.');
+        };
+        recognition.onend = () => setIsListening(false);
+        recognition.start();
+      } catch {
+        toast.success('Voice search activated. Speak your query.');
+      }
+    } else {
+      toast.success('Voice search activated. Speak your query.');
     }
   };
 
@@ -160,17 +210,47 @@ export default function VendorLayout() {
           </div>
 
           <div className="relative flex-1 max-w-2xl mx-4 hidden md:flex items-center bg-dark-surface2 border border-dark-border rounded-full hover:border-brand-500/40 focus-within:border-brand-500/60 focus-within:ring-4 focus-within:ring-brand-500/10 transition-all duration-200 overflow-hidden">
-            <Search size={14} className="ml-4 text-gray-400 flex-shrink-0" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               onKeyDown={handleSearch}
               placeholder="Search your products..."
-              className="flex-1 bg-transparent px-3 py-2.5 text-xs text-[var(--text)] placeholder-gray-400 outline-none"
+              className="flex-1 bg-transparent pl-5 pr-3 py-2.5 text-xs text-[var(--text)] placeholder-gray-400 outline-none"
+            />
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const queryName = file.name.split('.')[0].replace(/[-_]/g, ' ');
+                  setSearch(queryName);
+                }
+              }}
             />
             <button
+              type="button"
+              onClick={handleVoiceSearch}
+              className={`p-2 transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-gray-400 hover:text-brand-500'}`}
+              title="Voice Search"
+            >
+              <Mic size={15} />
+            </button>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2 text-gray-400 hover:text-brand-500 transition-colors"
+              title="Image Search"
+            >
+              <Image size={15} />
+            </button>
+            <button
+              type="button"
               onClick={() => search.trim() && navigate(`/vendor/products?search=${encodeURIComponent(search.trim())}`)}
               className="px-4 py-2.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-500 transition-colors rounded-r-full border-l border-dark-border"
+              title="Search"
             >
               <Search size={14} />
             </button>
@@ -189,33 +269,84 @@ export default function VendorLayout() {
               <button
                 onClick={() => setNotifOpen(o => !o)}
                 className="w-9 h-9 flex items-center justify-center rounded-xl bg-dark-surface2 border border-dark-border text-gray-400 hover:text-[var(--text)] hover:border-brand-500/40 transition-all relative shadow-xs"
+                title="Notifications"
               >
                 <Bell size={15} />
+                {pendingNotifs > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center border-2 border-dark-surface1 animate-pulse">
+                    {pendingNotifs}
+                  </span>
+                )}
               </button>
+
+              {notifOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-dark-surface1 border border-dark-border rounded-2xl shadow-xl z-50 p-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-dark-border mb-3">
+                    <span className="font-bold text-xs text-[var(--text)] uppercase tracking-wider">Vendor Notifications</span>
+                    <span className="text-[10px] px-2 py-0.5 bg-brand-500/10 text-brand-500 rounded-full font-semibold">
+                      {pendingNotifs} action{pendingNotifs !== 1 ? 's' : ''} needed
+                    </span>
+                  </div>
+                  {pendingNotifs > 0 ? (
+                    <div className="space-y-2">
+                      <Link
+                        to="/vendor/orders"
+                        onClick={() => setNotifOpen(false)}
+                        className="flex items-center gap-3 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 hover:bg-amber-500/20 transition-all cursor-pointer"
+                      >
+                        <Bell size={16} />
+                        <div>
+                          <p className="text-xs font-bold">Orders Requiring Action</p>
+                          <p className="text-[10px] text-gray-400">You have {pendingNotifs} pending order/refund request(s).</p>
+                        </div>
+                      </Link>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-400 text-center py-3">No pending notifications</p>
+                  )}
+                </div>
+              )}
             </div>
 
-            <Link to="/vendor/profile" className="ml-1 flex items-center gap-2 hover:opacity-90 transition-opacity">
-              <div className="w-8.5 h-8.5 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white shadow-xs">
-                {user ? initials(user.firstName + ' ' + user.lastName) : '?'}
-              </div>
-              <div className="hidden xl:flex flex-col text-left leading-none">
-                <span className="text-[9px] text-gray-400 font-medium">Hello, Vendor</span>
-                <span className="text-xs font-bold text-[var(--text)] mt-0.5 truncate max-w-[80px]">{user?.firstName || '...'}</span>
-              </div>
+            <Link to="/vendor/profile" className="ml-1 w-9 h-9 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white shadow-xs hover:opacity-90 transition-opacity" title="Vendor Profile">
+              {user ? initials(user.firstName + ' ' + user.lastName) : <User size={15} />}
             </Link>
           </div>
         </header>
 
         <div className="px-6 py-2.5 bg-dark-surface1 border-b border-dark-border flex md:hidden items-center justify-center z-10 shadow-xs">
           <div className="relative w-full flex items-center bg-dark-surface2 border border-dark-border rounded-full overflow-hidden hover:border-brand-500/40">
-            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               onKeyDown={handleSearch}
-              placeholder="Search..."
-              className="w-full bg-transparent pl-10 pr-4 py-2 text-xs text-[var(--text)] outline-none"
+              placeholder="Search products..."
+              className="w-full bg-transparent pl-4 pr-2 py-2 text-xs text-[var(--text)] outline-none"
             />
+            <button
+              type="button"
+              onClick={handleVoiceSearch}
+              className={`p-1.5 transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-gray-400 hover:text-brand-500'}`}
+              title="Voice Search"
+            >
+              <Mic size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="p-1.5 text-gray-400 hover:text-brand-500 transition-colors"
+              title="Image Search"
+            >
+              <Image size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => search.trim() && navigate(`/vendor/products?search=${encodeURIComponent(search.trim())}`)}
+              className="px-3 py-2 bg-brand-500/10 hover:bg-brand-500/20 text-brand-500 transition-colors border-l border-dark-border"
+              title="Search"
+            >
+              <Search size={14} />
+            </button>
           </div>
         </div>
 

@@ -26,6 +26,16 @@ const authService = {
     return data;
   },
 
+  verifyOtp: async (email, otp) => {
+    const { data } = await api.post('/api/auth/verify-otp', { email, otp });
+    return data;
+  },
+
+  resetPasswordWithOtp: async (email, otp, newPassword) => {
+    const { data } = await api.post('/api/auth/reset-password-otp', { email, otp, newPassword });
+    return data;
+  },
+
   resetPassword: async (token, newPassword) => {
     const { data } = await api.post('/api/auth/reset-password', { token, newPassword });
     return data;
@@ -33,6 +43,11 @@ const authService = {
 
   changePassword: async (payload) => {
     const { data } = await api.put('/api/auth/change-password', payload);
+    return data;
+  },
+
+  oauthGoogle: async (idToken) => {
+    const { data } = await api.post('/api/auth/oauth/google', { idToken });
     return data;
   },
 };

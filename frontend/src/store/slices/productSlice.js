@@ -48,8 +48,10 @@ const productSlice = createSlice({
     },
     filters: {
       category:  '',
+      categoryId: '',
       minPrice:  '',
       maxPrice:  '',
+      ratingMin: '',
       sortBy:    'createdAt',
       sortDir:   'desc',
       search:    '',
@@ -64,7 +66,7 @@ const productSlice = createSlice({
       state.pagination = { ...state.pagination, page: 0 };
     },
     clearFilters(state) {
-      state.filters = { category: '', minPrice: '', maxPrice: '', sortBy: 'createdAt', sortDir: 'desc', search: '' };
+      state.filters = { category: '', categoryId: '', minPrice: '', maxPrice: '', ratingMin: '', sortBy: 'createdAt', sortDir: 'desc', search: '' };
     },
     setPage(state, action) {
       state.pagination.page = action.payload;

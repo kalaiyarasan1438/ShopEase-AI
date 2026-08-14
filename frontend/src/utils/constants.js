@@ -7,8 +7,10 @@ export const ROLES = {
 
 // ── Order Statuses ────────────────────────────────────────────────────────────
 export const ORDER_STATUSES = [
-  'PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED',
+  'ORDER_PLACED', 'CONFIRMED', 'PROCESSING', 'OUT_FOR_DELIVERY', 'DELIVERED',
+  'CANCELLED', 'REFUND_REQUESTED', 'REFUNDED', 'REFUND_REJECTED',
 ];
+
 
 // ── Sort Options ──────────────────────────────────────────────────────────────
 export const SORT_OPTIONS = [
@@ -25,6 +27,7 @@ export const PAYMENT_METHODS = [
   { id: 'UPI',    label: 'UPI',                 icon: '📱' },
   { id: 'BANK',   label: 'Net Banking',         icon: '🏦' },
   { id: 'WALLET', label: 'Wallet',              icon: '💰' },
+  { id: 'COD',    label: 'Cash on Delivery',    icon: '💵' },
 ];
 
 // ── Shipping Options ──────────────────────────────────────────────────────────

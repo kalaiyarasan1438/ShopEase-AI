@@ -39,8 +39,15 @@ export default function ProtectedRoute({ children, roles = [] }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (roles.length > 0 && !roles.includes(userRole)) {
-    return <Navigate to="/403" replace />;
+  const user = useSelector((state) => state.auth.user);
+  const userRoles = user?.roles || [];
+  const userRoleArray = Array.isArray(userRoles) ? userRoles : Array.from(userRoles);
+
+  if (roles.length > 0) {
+    const hasRole = roles.some(r => userRoleArray.includes(r) || userRole === r);
+    if (!hasRole) {
+      return <Navigate to="/403" replace />;
+    }
   }
 
   return children || <Outlet />;

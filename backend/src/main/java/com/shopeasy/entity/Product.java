@@ -47,15 +47,15 @@ public class Product {
     @Column(nullable = false)
     private Integer stockQty;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vendor_id")
     private Vendor vendor;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<ProductImage> images = new ArrayList<>();
 
@@ -75,7 +75,7 @@ public class Product {
     @Builder.Default
     private Integer ratingCount = 0;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "product_specifications", joinColumns = @JoinColumn(name = "product_id"))
     @MapKeyColumn(name = "spec_name")
     @Column(name = "spec_value")

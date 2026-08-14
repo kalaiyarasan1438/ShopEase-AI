@@ -51,6 +51,12 @@ public class OrderController {
         return ResponseEntity.ok(orderService.cancelOrder(id));
     }
 
+    @Operation(summary = "Request a refund for a delivered order")
+    @PatchMapping("/{id}/refund")
+    public ResponseEntity<OrderResponse> requestRefund(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.requestRefund(id));
+    }
+
     // ── Admin endpoints ────────────────────────────────────────────────────
 
     @Operation(summary = "[ADMIN] Get all orders")

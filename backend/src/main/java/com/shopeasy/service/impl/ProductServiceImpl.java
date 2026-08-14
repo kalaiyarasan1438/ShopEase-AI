@@ -39,10 +39,11 @@ public class ProductServiceImpl implements ProductService {
         String      search,
         Long        categoryId,
         BigDecimal  minPrice,
-        BigDecimal  maxPrice
+        BigDecimal  maxPrice,
+        Double      ratingMin
     ) {
         return productRepository
-            .findWithFilters(search, categoryId, minPrice, maxPrice, pageable)
+            .findWithFilters(search, categoryId, minPrice, maxPrice, ratingMin, pageable)
             .map(ProductResponse::fromEntity);
     }
 
@@ -56,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponse> searchProducts(String query, Pageable pageable) {
         return productRepository
-            .findWithFilters(query, null, null, null, pageable)
+            .findWithFilters(query, null, null, null, null, pageable)
             .map(ProductResponse::fromEntity);
     }
 

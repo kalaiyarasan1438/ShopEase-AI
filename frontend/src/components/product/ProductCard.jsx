@@ -32,6 +32,12 @@ const ProductCard = memo(({ product }) => {
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className="group relative bg-dark-surface1 border border-dark-border rounded-2xl overflow-hidden hover:shadow-md transition-shadow duration-300"
     >
+      {/* Out‑of‑Stock overlay */}
+      {product.stockQty === 0 && (
+        <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-2xl backdrop-blur-sm z-20">
+          <span className="text-white text-xl font-bold tracking-wider">Out of Stock</span>
+        </div>
+      )}
       <Link to={`/products/${product.id}`} className="block">
         {/* Image Container */}
         <div className="relative aspect-[4/3] bg-dark-surface2 overflow-hidden">
@@ -98,8 +104,9 @@ const ProductCard = memo(({ product }) => {
 
             <button
               onClick={handleAddToCart}
-              className="w-9 h-9 rounded-xl flex items-center justify-center bg-brand-500 hover:bg-brand-600 text-white transition-all shadow-sm shadow-brand-500/10 hover:shadow-md active:scale-95"
-              title="Add to Cart"
+              disabled={product.stockQty === 0}
+              className="w-9 h-9 rounded-xl flex items-center justify-center bg-brand-500 hover:bg-brand-600 text-white transition-all shadow-sm shadow-brand-500/10 hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={product.stockQty === 0 ? 'Out of Stock' : 'Add to Cart'}
             >
               <ShoppingCart size={14} />
             </button>

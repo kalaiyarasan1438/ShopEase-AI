@@ -11,6 +11,8 @@ import Skeleton from '@components/common/Skeleton.jsx';
 import Badge from '@components/common/Badge.jsx';
 import ImageWithFallback from '@components/common/ImageWithFallback.jsx';
 import { formatCurrency, calcDiscount } from '@utils/formatters';
+import api from '@services/api';
+import toast from 'react-hot-toast';
 
 // Mock product for demo when API is not connected
 const MOCK_PRODUCT = {
@@ -26,7 +28,77 @@ const MOCK_PRODUCT = {
   ]
 };
 
+function StarRow({ rating, size = 14 }) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map(s => (
+        <Star key={s} size={size} className={s <= Math.round(rating) ? 'text-amber-400 fill-amber-400' : 'text-gray-500'} />
+      ))}
+    </div>
+  );
+}
 
+function ReviewsSection({ productId }) {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!productId) return;
+    api.get(`/api/products/${productId}/reviews?page=0&size=10`)
+      .then(res => setReviews(res.data.content || []))
+      .catch(() => setReviews([]))
+      .finally(() => setLoading(false));
+  }, [productId]);
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-10">
+      <div className="w-6 h-6 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
+    </div>
+  );
+
+  if (reviews.length === 0) return (
+    <div className="text-center py-10 text-[var(--text3)]">
+      <Star size={32} className="mx-auto mb-2 opacity-30" />
+      <p className="text-sm">No reviews yet. Purchase this product to leave a review.</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4">
+      {reviews.map((r, i) => (
+        <motion.div key={r.id || i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+          className="bg-dark-surface2 border border-dark-border rounded-2xl p-5">
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                {r.user?.firstName?.[0] || r.userName?.[0] || 'U'}
+              </div>
+              <div>
+                <p className="font-bold text-sm text-[var(--text)]">
+                  {r.user?.firstName && r.user?.lastName ? `${r.user.firstName} ${r.user.lastName}` : r.userName || 'Verified Customer'}
+                </p>
+                {r.isVerified && (
+                  <span className="text-[10px] font-bold text-green-500">✓ Verified Purchase</span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <StarRow rating={r.rating} />
+              <span className="text-xs font-bold text-amber-400">{r.rating}/5</span>
+            </div>
+          </div>
+          {r.title && <p className="font-semibold text-sm text-[var(--text)] mb-1">{r.title}</p>}
+          {r.body && <p className="text-sm text-[var(--text2)] leading-relaxed">{r.body}</p>}
+          {r.createdAt && (
+            <p className="text-[10px] text-[var(--text3)] mt-3 font-medium">
+              {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </p>
+          )}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
 export default function ProductDetail() {
   const { id }      = useParams();
@@ -37,7 +109,6 @@ export default function ProductDetail() {
   const isWishlisted = useSelector(state => selectIsWishlisted(state, product?.id));
 
   const [qty,      setQty]      = useState(1);
-
   const [activeImgIndex, setActiveImgIndex] = useState(0);
 
   useEffect(() => {
@@ -54,13 +125,15 @@ export default function ProductDetail() {
   const allImages = [product.imageUrl, ...(product.galleryImages || [])].filter(Boolean);
   const activeImgUrl = allImages[activeImgIndex] || product.imageUrl;
 
-
-
   const handleAddToCart = () => {
     dispatch(addToCart({ product, quantity: qty }));
   };
 
   const handleBuyNow = () => {
+    if (!product || product.stockQty === 0) {
+      toast.error('This product is currently out of stock!');
+      return;
+    }
     dispatch(addToCart({ product, quantity: qty }));
     navigate('/checkout');
   };
@@ -80,18 +153,18 @@ export default function ProductDetail() {
         {/* Images */}
         <div>
           <div className="relative aspect-square bg-dark-surface2 border border-dark-border rounded-3xl flex items-center justify-center overflow-hidden mb-4 shadow-xs group">
-            <ImageWithFallback 
-              src={activeImgUrl} 
-              alt={product.name} 
+            <ImageWithFallback
+              src={activeImgUrl}
+              alt={product.name}
               wrapperClassName="w-full h-full"
-              imgClassName="group-hover:scale-125 transition-transform duration-500 cursor-crosshair" 
+              imgClassName="group-hover:scale-125 transition-transform duration-500 cursor-crosshair"
             />
           </div>
           {allImages.length > 1 && (
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
               {allImages.map((img, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   onClick={() => setActiveImgIndex(idx)}
                   className={`w-20 h-20 flex-shrink-0 bg-dark-surface2 border-2 rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer transition-all ${idx === activeImgIndex ? 'border-brand-500 opacity-100' : 'border-dark-border opacity-60 hover:opacity-100 hover:border-brand-500/30'}`}
                 >
@@ -114,14 +187,9 @@ export default function ProductDetail() {
           <h1 className="text-2xl font-bold tracking-tight leading-tight mb-3 text-[var(--text)]">{product.name}</h1>
 
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex items-center gap-1">
-              {[1,2,3,4,5].map(s => (
-                <Star key={s} size={14} className={s <= Math.round(product.ratingAvg) ? 'text-amber-500 fill-amber-500' : 'text-gray-300'} />
-              ))}
-            </div>
-            <span className="font-bold text-sm text-[var(--text)]">{product.ratingAvg?.toFixed(1)}</span>
-            <span className="text-gray-500 text-sm">({product.ratingCount?.toLocaleString()} reviews)</span>
-            <span className="text-brand-500 font-bold text-sm cursor-pointer hover:underline">View all →</span>
+            <StarRow rating={product.ratingAvg || 0} />
+            <span className="font-bold text-sm text-[var(--text)]">{Number(product.ratingAvg || 0).toFixed(1)}</span>
+            <span className="text-gray-500 text-sm">({(product.ratingCount || 0).toLocaleString()} reviews)</span>
           </div>
 
           <div className="flex items-baseline gap-3 mb-6">
@@ -144,9 +212,7 @@ export default function ProductDetail() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
                   {Object.entries(product.specifications).map(([key, value]) => (
                     <div key={key} className="flex items-start gap-2.5">
-                      <div className="mt-0.5 text-brand-500">
-                        <Tag size={14} />
-                      </div>
+                      <div className="mt-0.5 text-brand-500"><Tag size={14} /></div>
                       <div>
                         <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{key}</p>
                         <p className="text-xs text-[var(--text)] font-medium mt-0.5">{value}</p>
@@ -206,7 +272,7 @@ export default function ProductDetail() {
               <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Sold by</p>
               <p className="font-bold text-sm text-[var(--text)]">{product.vendorName || 'ShopEasy Store'}</p>
             </div>
-            <Badge variant="success">★ {product.ratingAvg?.toFixed(1)}</Badge>
+            <Badge variant="success">★ {Number(product.ratingAvg || 0).toFixed(1)}</Badge>
           </div>
         </div>
       </div>
@@ -220,6 +286,28 @@ export default function ProductDetail() {
           </div>
         </div>
       )}
+
+      {/* Customer Reviews Section */}
+      <div className="mb-10">
+        <div className="flex items-center justify-between mb-5 border-b border-dark-border pb-3">
+          <h2 className="text-lg font-bold tracking-tight text-[var(--text)] flex items-center gap-2">
+            <Star size={18} className="text-amber-400 fill-amber-400" />
+            Customer Reviews
+            {product.ratingCount > 0 && (
+              <span className="text-sm font-normal text-[var(--text3)]">
+                · {Number(product.ratingAvg || 0).toFixed(1)} / 5 ({(product.ratingCount || 0).toLocaleString()} reviews)
+              </span>
+            )}
+          </h2>
+          {product.ratingCount > 0 && (
+            <div className="flex items-center gap-2">
+              <StarRow rating={product.ratingAvg || 0} size={16} />
+              <span className="font-bold text-amber-400">{Number(product.ratingAvg || 0).toFixed(1)}</span>
+            </div>
+          )}
+        </div>
+        <ReviewsSection productId={product.id} />
+      </div>
 
       {/* Related Products */}
       {related.length > 0 && (

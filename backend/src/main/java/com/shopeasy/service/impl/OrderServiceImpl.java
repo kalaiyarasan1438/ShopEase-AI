@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,9 +76,23 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal tax   = subtotal.multiply(TAX_RATE);
         BigDecimal total = subtotal.add(shippingCost).add(tax);
 
+        Order.PaymentMethod pm;
+        try {
+            pm = Order.PaymentMethod.valueOf(
+                req.getPaymentMethod() != null ? req.getPaymentMethod().toUpperCase() : "CARD"
+            );
+        } catch (IllegalArgumentException e) {
+            pm = Order.PaymentMethod.CARD;
+        }
+
+        // For Cash on Delivery (COD), payment status is PENDING upon order placement
+        Order.PaymentStatus ps = (pm == Order.PaymentMethod.COD)
+            ? Order.PaymentStatus.PENDING
+            : Order.PaymentStatus.PAID;
+
         Order order = Order.builder()
             .user(user)
-            .status(Order.OrderStatus.CONFIRMED)
+            .status(Order.OrderStatus.ORDER_PLACED)
             .totalAmount(total)
             .shippingAmount(shippingCost)
             .taxAmount(tax)
@@ -88,10 +103,10 @@ public class OrderServiceImpl implements OrderService {
             .shippingState(req.getShippingState())
             .shippingZip(req.getShippingZip())
             .shippingCountry(req.getShippingCountry())
-            .paymentMethod(Order.PaymentMethod.valueOf(
-                req.getPaymentMethod() != null ? req.getPaymentMethod() : "CARD"
-            ))
-            .paymentStatus(Order.PaymentStatus.PAID)
+            .paymentMethod(pm)
+            .paymentStatus(ps)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
             .build();
 
         items.forEach(item -> {
@@ -100,7 +115,7 @@ public class OrderServiceImpl implements OrderService {
         });
 
         Order saved = orderRepository.save(order);
-        log.info("Order placed: id={} user={} total={}", saved.getId(), user.getEmail(), total);
+        log.info("Order placed: id={} user={} total={} method={}", saved.getId(), user.getEmail(), total, pm);
 
         // Clear user's cart after successful order
         cartRepository.findByUserId(user.getId())
@@ -133,12 +148,46 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse cancelOrder(Long id) {
         Order order = orderRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Order", id));
-        if (order.getStatus() != Order.OrderStatus.PENDING &&
-            order.getStatus() != Order.OrderStatus.CONFIRMED) {
-            throw new IllegalArgumentException("Cannot cancel order in status: " + order.getStatus());
+        User user = getCurrentUser();
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedException("Access denied to order " + id);
         }
+
+        if (order.getStatus() != Order.OrderStatus.ORDER_PLACED &&
+            order.getStatus() != Order.OrderStatus.CONFIRMED &&
+            order.getStatus() != Order.OrderStatus.PROCESSING) {
+            throw new IllegalArgumentException("Cannot cancel order in status: " + order.getStatus() + ". Cancellation is only permitted before order is Out for Delivery or Delivered.");
+        }
+
+        // Restore product stock quantity
+        restoreStock(order);
+
         order.setStatus(Order.OrderStatus.CANCELLED);
-        return OrderResponse.fromEntity(orderRepository.save(order));
+        order.setUpdatedAt(LocalDateTime.now());
+        Order saved = orderRepository.save(order);
+        log.info("Order cancelled: id={} user={}", saved.getId(), user.getEmail());
+        return OrderResponse.fromEntity(saved);
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse requestRefund(Long id) {
+        Order order = orderRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Order", id));
+        User user = getCurrentUser();
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedException("Access denied to order " + id);
+        }
+
+        if (order.getStatus() != Order.OrderStatus.DELIVERED) {
+            throw new IllegalArgumentException("Refund can only be requested for Delivered orders. Current status: " + order.getStatus());
+        }
+
+        order.setStatus(Order.OrderStatus.REFUND_REQUESTED);
+        order.setUpdatedAt(LocalDateTime.now());
+        Order saved = orderRepository.save(order);
+        log.info("Refund requested for order: id={} user={}", saved.getId(), user.getEmail());
+        return OrderResponse.fromEntity(saved);
     }
 
     @Override
@@ -149,14 +198,57 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse updateOrderStatus(Long id, String status) {
+    public OrderResponse updateOrderStatus(Long id, String statusStr) {
         Order order = orderRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Order", id));
-        order.setStatus(Order.OrderStatus.valueOf(status.toUpperCase()));
-        return OrderResponse.fromEntity(orderRepository.save(order));
+
+        Order.OrderStatus newStatus = Order.OrderStatus.valueOf(statusStr.toUpperCase());
+        Order.OrderStatus oldStatus = order.getStatus();
+
+        // If rejecting refund → revert to DELIVERED
+        if (newStatus == Order.OrderStatus.REFUND_REJECTED) {
+            order.setStatus(Order.OrderStatus.DELIVERED);
+            order.setUpdatedAt(LocalDateTime.now());
+            Order saved = orderRepository.save(order);
+            log.info("Refund rejected for order: id={}, reverted to DELIVERED", id);
+            return OrderResponse.fromEntity(saved);
+        }
+
+        // If approving refund → update payment status
+        if (newStatus == Order.OrderStatus.REFUNDED) {
+            order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
+        }
+
+        // If marked as DELIVERED and was COD, mark payment as PAID
+        if (newStatus == Order.OrderStatus.DELIVERED && order.getPaymentMethod() == Order.PaymentMethod.COD) {
+            order.setPaymentStatus(Order.PaymentStatus.PAID);
+        }
+
+        // Stock restoration if moving to CANCELLED
+        if (newStatus == Order.OrderStatus.CANCELLED && oldStatus != Order.OrderStatus.CANCELLED) {
+            restoreStock(order);
+        }
+
+        order.setStatus(newStatus);
+        order.setUpdatedAt(LocalDateTime.now());
+        Order saved = orderRepository.save(order);
+        log.info("Order status updated: id={} from={} to={}", id, oldStatus, newStatus);
+        return OrderResponse.fromEntity(saved);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private void restoreStock(Order order) {
+        if (order.getItems() != null) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                if (product != null) {
+                    product.setStockQty(product.getStockQty() + item.getQuantity());
+                    productRepository.save(product);
+                }
+            }
+        }
+    }
 
     private User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

@@ -23,14 +23,14 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private OrderStatus status = OrderStatus.PENDING;
+    private OrderStatus status = OrderStatus.ORDER_PLACED;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
@@ -60,7 +60,7 @@ public class Order {
     private String trackingNumber;
     private String notes;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
 
@@ -72,7 +72,8 @@ public class Order {
 
     // ── Enums ─────────────────────────────────────────────────────────────────
     public enum OrderStatus {
-        PENDING, CONFIRMED, PROCESSING, SHIPPED, DELIVERED, CANCELLED, REFUNDED
+        ORDER_PLACED, CONFIRMED, PROCESSING, OUT_FOR_DELIVERY, DELIVERED,
+        CANCELLED, REFUND_REQUESTED, REFUNDED, REFUND_REJECTED
     }
 
     public enum PaymentStatus {

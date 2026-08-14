@@ -143,6 +143,41 @@ export default function VendorAddProduct() {
 
           <div className="bg-dark-surface1 border border-dark-border rounded-2xl p-6 shadow-sm">
             <h2 className="font-bold text-sm text-[var(--text)] mb-4">Product Image</h2>
+            
+            {/* File Upload Option */}
+            <div className="mb-4">
+              <label className="block text-xs font-bold text-[var(--text3)] uppercase tracking-wider mb-1.5">Upload Image File (&lt; 2MB)</label>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  if (!file.type.startsWith('image/')) {
+                    toast.error('Only image files (JPEG, PNG, WEBP, GIF) are allowed.');
+                    return;
+                  }
+                  if (file.size > 2 * 1024 * 1024) {
+                    toast.error('File size exceeds maximum limit of 2MB.');
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    setForm(f => ({ ...f, imageUrl: event.target.result }));
+                    toast.success('Image loaded for preview!');
+                  };
+                  reader.readAsDataURL(file);
+                }}
+                className="w-full text-xs text-[var(--text3)] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500/10 file:text-brand-500 hover:file:bg-brand-500/20 cursor-pointer"
+              />
+            </div>
+
+            <div className="relative flex py-1 items-center mb-3">
+              <div className="flex-grow border-t border-dark-border"></div>
+              <span className="flex-shrink mx-2 text-[10px] text-gray-500 uppercase font-semibold">or image url</span>
+              <div className="flex-grow border-t border-dark-border"></div>
+            </div>
+
             <div>
               <label className="block text-xs font-bold text-[var(--text3)] uppercase tracking-wider mb-1.5">Image URL</label>
               <input value={form.imageUrl}
@@ -151,8 +186,15 @@ export default function VendorAddProduct() {
                 className="w-full bg-dark-surface2 border border-dark-border rounded-xl px-4 py-2.5 text-sm text-[var(--text)] outline-none focus:border-brand-500/60 transition-all" />
             </div>
             {form.imageUrl && (
-              <div className="mt-3">
-                <img src={form.imageUrl} alt="Preview" className="w-full h-40 object-cover rounded-xl bg-dark-surface3" />
+              <div className="mt-3 relative group">
+                <img src={form.imageUrl} alt="Preview" className="w-full h-40 object-cover rounded-xl bg-dark-surface3 border border-dark-border" />
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, imageUrl: '' }))}
+                  className="absolute top-2 right-2 px-2 py-1 bg-red-500/80 hover:bg-red-600 text-white text-[10px] font-bold rounded-md backdrop-blur-xs transition-all"
+                >
+                  Remove
+                </button>
               </div>
             )}
           </div>

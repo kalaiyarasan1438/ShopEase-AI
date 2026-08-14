@@ -14,7 +14,7 @@ export default function VendorProfile() {
     defaultValues: {
       firstName: user?.firstName || 'Vendor',
       lastName:  user?.lastName  || 'User',
-      email:     user?.email     || 'vendor@shopeasy.com',
+      email:     user?.email     || 'vendor@gmail.com',
       phone:     user?.phone     || '+91 98765 43210',
     }
   });

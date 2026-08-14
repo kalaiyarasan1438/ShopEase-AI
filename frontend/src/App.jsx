@@ -13,6 +13,7 @@ import {
   selectAuthInitialized,
   selectUserRole,
 } from './store/slices/authSlice.js';
+import { fetchWishlist } from './store/slices/wishlistSlice.js';
 
 // Lazy-loaded pages for code splitting
 const Home           = lazy(() => import('./pages/Home.jsx'));
@@ -41,6 +42,7 @@ const Analytics      = lazy(() => import('./pages/Analytics.jsx'));
 const Profile        = lazy(() => import('./pages/Profile.jsx'));
 const Login          = lazy(() => import('./pages/Login.jsx'));
 const Register       = lazy(() => import('./pages/Register.jsx'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
 const Forbidden      = lazy(() => import('./pages/Forbidden.jsx'));
 const NotFound       = lazy(() => import('./pages/NotFound.jsx'));
 
@@ -60,23 +62,24 @@ export default function App() {
   // On every app mount, if an accessToken exists in localStorage, attempt to
   // fetch the current user from the server. This restores the Redux user state
   // after a page refresh without forcing a re-login.
+  const user = useSelector((state) => state.auth.user);
+
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
       dispatch(fetchCurrentUser());
-    } else {
-      // No token — mark as initialized immediately so routes don't hang
-      // authInitialized stays false until this runs, so we dispatch a no-op
-      // by importing the action directly. Instead, we handle this in authSlice
-      // via the fetchCurrentUser.rejected handler which checks for missing token.
-      dispatch(fetchCurrentUser());
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      dispatch(fetchWishlist());
+    }
+  }, [isAuthenticated, user?.id, dispatch]);
 
   // Derive the smart redirect target for authenticated users hitting /login or /register
   const authenticatedRedirect = () => {
-    if (!isAuthenticated) return null;
+    if (!isAuthenticated || !user) return null;
     if (userRole === 'ADMIN')  return '/admin/dashboard';
     if (userRole === 'VENDOR') return '/vendor/dashboard';
     return '/';
@@ -96,6 +99,10 @@ export default function App() {
           <Route
             path="/register"
             element={authRedirect ? <Navigate to={authRedirect} replace /> : <Register />}
+          />
+          <Route
+            path="/forgot-password"
+            element={<ForgotPassword />}
           />
         </Route>
 

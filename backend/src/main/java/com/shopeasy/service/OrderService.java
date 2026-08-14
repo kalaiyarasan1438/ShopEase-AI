@@ -10,6 +10,7 @@ public interface OrderService {
     Page<OrderResponse> getMyOrders(Pageable pageable);
     OrderResponse getOrderById(Long id);
     OrderResponse cancelOrder(Long id);
+    OrderResponse requestRefund(Long id);
     Page<OrderResponse> getAllOrders(Pageable pageable, String status);
     OrderResponse updateOrderStatus(Long id, String status);
 }

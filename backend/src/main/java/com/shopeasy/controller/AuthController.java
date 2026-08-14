@@ -1,8 +1,12 @@
 package com.shopeasy.controller;
 
+import com.shopeasy.dto.request.ForgotPasswordRequest;
 import com.shopeasy.dto.request.LoginRequest;
+import com.shopeasy.dto.request.OAuthRequest;
 import com.shopeasy.dto.request.RegisterRequest;
 import com.shopeasy.dto.request.RefreshTokenRequest;
+import com.shopeasy.dto.request.ResetPasswordWithOtpRequest;
+import com.shopeasy.dto.request.VerifyOtpRequest;
 import com.shopeasy.dto.response.AuthResponse;
 import com.shopeasy.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,20 +49,46 @@ public class AuthController {
         return ResponseEntity.ok(authService.getCurrentUser());
     }
 
-    @Operation(summary = "Request password reset email")
+    @Operation(summary = "Request 6-digit OTP for password reset")
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
-        authService.forgotPassword(email);
-        return ResponseEntity.ok().body("Password reset email sent");
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.sendForgotPasswordOtp(request.getEmail());
+        return ResponseEntity.ok().body(java.util.Map.of("message", "A 6-digit OTP has been sent to your email address. It is valid for 5 minutes."));
     }
 
-    @Operation(summary = "Reset password with token")
+    @Operation(summary = "Verify 6-digit OTP for password reset")
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
+        boolean valid = authService.verifyOtp(request.getEmail(), request.getOtp());
+        return ResponseEntity.ok().body(java.util.Map.of("valid", valid, "message", "OTP verified successfully"));
+    }
+
+    @Operation(summary = "Reset password using 6-digit OTP")
+    @PostMapping("/reset-password-otp")
+    public ResponseEntity<?> resetPasswordWithOtp(@Valid @RequestBody ResetPasswordWithOtpRequest request) {
+        authService.resetPasswordWithOtp(request.getEmail(), request.getOtp(), request.getNewPassword());
+        return ResponseEntity.ok().body(java.util.Map.of("message", "Password has been successfully reset. You can now log in with your new password."));
+    }
+
+    @Operation(summary = "Reset password with token (legacy)")
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(
-        @RequestParam String token,
-        @RequestParam String newPassword
+        @RequestBody(required = false) java.util.Map<String, String> body,
+        @RequestParam(required = false) String token,
+        @RequestParam(required = false) String newPassword
     ) {
-        authService.resetPassword(token, newPassword);
-        return ResponseEntity.ok().body("Password reset successful");
+        String t = (body != null && body.containsKey("token")) ? body.get("token") : token;
+        String p = (body != null && body.containsKey("newPassword")) ? body.get("newPassword") : newPassword;
+        if (t == null || p == null) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", "Token and newPassword are required"));
+        }
+        authService.resetPassword(t, p);
+        return ResponseEntity.ok().body(java.util.Map.of("message", "Password reset successful"));
+    }
+
+    @Operation(summary = "Sign in or register with Google OAuth")
+    @PostMapping("/oauth/google")
+    public ResponseEntity<AuthResponse> oauthGoogle(@Valid @RequestBody OAuthRequest request) {
+        return ResponseEntity.ok(authService.loginGoogle(request));
     }
 }

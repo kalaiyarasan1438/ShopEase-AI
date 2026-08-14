@@ -83,12 +83,27 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex, WebRequest req) {
+        log.warn("Illegal argument: {}", ex.getMessage());
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex, WebRequest req) {
+        log.warn("Illegal state: {}", ex.getMessage());
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), req);
+    }
+
+    // Handle Spring MVC 404 for missing endpoints — returns JSON instead of HTML
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(
+            org.springframework.web.servlet.resource.NoResourceFoundException ex, WebRequest req) {
+        log.warn("No handler found: {}", ex.getMessage());
+        return buildError(HttpStatus.NOT_FOUND, "API endpoint not found: " + ex.getResourcePath(), req);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, WebRequest req) {
         log.error("Unexpected error: ", ex);
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", req);
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred: " + ex.getMessage(), req);
     }
 }

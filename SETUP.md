@@ -130,9 +130,13 @@ The database seeder automatically initializes the following accounts:
 
 | Role | Email | Password | Permissions / Capabilities |
 | :--- | :--- | :--- | :--- |
-| **Admin** | `admin@shopeasy.com` | `admin123` | Full dashboard access, category creation, analytics tracking. |
-| **Vendor** | `vendor@shopeasy.com` | `vendor123` | Manage products, track active sales metrics, review orders. |
-| **Customer** | `customer@shopeasy.com` | `customer123` | Regular shopping, profile updates, add to cart/wishlist, checkout. |
+| **Admin** | `admin@shopeasy.in` | `Admin@123` | Full dashboard access, category creation, analytics tracking. |
+| **Vendor** | `vendor@gmail.com` | `Vendor@123` | Manage products, track active sales metrics, review orders. |
+| **Customer** | Register via `/register` with any `@gmail.com` | Custom | Regular shopping, profile updates, add to cart/wishlist, checkout. |
+
+> **Email Policy (enforced since v1.1):**
+> - **Admin:** Only `admin@shopeasy.in` is permitted to log in.
+> - **Vendor & Customer:** Only `@gmail.com` addresses are accepted for registration and login.
 
 ---
 

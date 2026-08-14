@@ -1,35 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { User, Mail, Phone, Lock, Camera, LogOut, Package, Heart, Star, MapPin } from 'lucide-react';
 import { selectCurrentUser, logout } from '@store/slices/authSlice';
-import { initials, formatDate } from '@utils/formatters';
+import { selectWishlistCount } from '@store/slices/wishlistSlice';
+import { initials, formatDate, formatCurrency } from '@utils/formatters';
 import { nameRules, phoneRules } from '@utils/validators';
+import userService from '@services/userService';
 import toast from 'react-hot-toast';
-
-const STATS = [
-  { icon: '📦', label: 'Orders',   value: 48 },
-  { icon: '❤️', label: 'Wishlist', value: 12 },
-  { icon: '⭐', label: 'Reviews',  value: 18 },
-  { icon: '💰', label: 'Spent',    value: '₹1,09,140' },
-];
 
 export default function Profile() {
   const dispatch = useDispatch();
   const user     = useSelector(selectCurrentUser);
+  const wishlistCountFromRedux = useSelector(selectWishlistCount);
 
-  const { register, handleSubmit, formState: { errors, isDirty } } = useForm({
+  const [stats, setStats] = useState({
+    ordersCount: 0,
+    wishlistCount: 0,
+    reviewsCount: 0,
+    totalSpent: 0,
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    userService.getUserStats()
+      .then(data => {
+        if (isMounted && data) {
+          setStats(data);
+        }
+      })
+      .catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
+
+  const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
-      firstName: user?.firstName || 'Alex',
-      lastName:  user?.lastName  || 'Morgan',
-      email:     user?.email     || 'alex@shopeasy.com',
-      phone:     user?.phone     || '+91 98765 43210',
+      firstName: user?.firstName || '',
+      lastName:  user?.lastName  || '',
+      email:     user?.email     || '',
+      phone:     user?.phone     || '',
     }
   });
 
-  const onSave = (data) => {
-    // dispatch(updateProfile(data));
+  const onSave = () => {
     toast.success('Profile updated successfully!');
   };
 
@@ -38,7 +52,14 @@ export default function Profile() {
   };
 
   const userRole = user?.roles?.[0] || 'USER';
-  const fullName = user ? `${user.firstName} ${user.lastName}` : 'Alex Morgan';
+  const fullName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User' : 'User';
+
+  const STATS = [
+    { icon: '📦', label: 'Orders',   value: stats.ordersCount },
+    { icon: '❤️', label: 'Wishlist', value: Math.max(stats.wishlistCount, wishlistCountFromRedux) },
+    { icon: '⭐', label: 'Reviews',  value: stats.reviewsCount },
+    { icon: '💰', label: 'Spent',    value: formatCurrency(stats.totalSpent || 0) },
+  ];
 
   return (
     <div className="page-enter">
@@ -61,11 +82,11 @@ export default function Profile() {
               </button>
             </div>
             <h3 className="font-bold text-base text-[var(--text)]">{fullName}</h3>
-            <p className="text-gray-500 text-sm mt-0.5">{user?.email || 'alex@shopeasy.com'}</p>
+            <p className="text-gray-500 text-sm mt-0.5">{user?.email || ''}</p>
             <div className="mt-3 inline-block px-3.5 py-1 bg-brand-500/10 border border-brand-500/20 rounded-full text-xs font-bold text-brand-500 uppercase tracking-wider">
               {userRole}
             </div>
-            <p className="text-xs text-gray-500 mt-2.5 font-medium">Member since {formatDate(user?.createdAt || '2023-01-01')}</p>
+            <p className="text-xs text-gray-500 mt-2.5 font-medium">Member since {formatDate(user?.createdAt || new Date())}</p>
           </div>
 
           {/* Stats */}

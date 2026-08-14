@@ -49,13 +49,15 @@ export const initials = (name) =>
 
 // ── Order Status ──────────────────────────────────────────────────────────────
 export const ORDER_STATUS_CONFIG = {
-  PENDING: { label: 'Pending', color: 'warning', icon: '⏳' },
-  CONFIRMED: { label: 'Confirmed', color: 'info', icon: '✅' },
-  PROCESSING: { label: 'Processing', color: 'warning', icon: '⚙️' },
-  SHIPPED: { label: 'Shipped', color: 'info', icon: '🚚' },
-  DELIVERED: { label: 'Delivered', color: 'success', icon: '📦' },
-  CANCELLED: { label: 'Cancelled', color: 'danger', icon: '❌' },
-  REFUNDED: { label: 'Refunded', color: 'neutral', icon: '↩️' },
+  ORDER_PLACED:     { label: 'Order Placed',     color: 'info',    icon: '✅' },
+  CONFIRMED:        { label: 'Order Confirmed',  color: 'info',    icon: '📝' },
+  PROCESSING:       { label: 'Processing',       color: 'warning', icon: '⚙️' },
+  OUT_FOR_DELIVERY: { label: 'Out for Delivery', color: 'info',    icon: '🚚' },
+  DELIVERED:        { label: 'Delivered',        color: 'success', icon: '📦' },
+  CANCELLED:        { label: 'Cancelled',        color: 'danger',  icon: '❌' },
+  REFUND_REQUESTED: { label: 'Refund Requested', color: 'warning', icon: '🔄' },
+  REFUNDED:         { label: 'Refunded',         color: 'neutral', icon: '↩️' },
+  REFUND_REJECTED:  { label: 'Refund Rejected',  color: 'danger',  icon: '🚫' },
 };
 
 export const getStatusConfig = (status) =>

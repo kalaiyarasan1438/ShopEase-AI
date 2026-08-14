@@ -15,9 +15,11 @@ import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
@@ -34,11 +36,11 @@ public class VendorController {
     private final CategoryRepository categoryRepository;
 
     // ── Helper: resolve vendor from auth ────────────────────────────────────
+    // Uses a JOIN FETCH query to load the User eagerly — avoids LazyInitializationException
+    // that the old vendorRepository.findAll().stream().filter() pattern could cause.
     private Vendor resolveVendor(Authentication auth) {
         String email = auth.getName();
-        return vendorRepository.findAll().stream()
-            .filter(v -> v.getUser().getEmail().equals(email))
-            .findFirst()
+        return vendorRepository.findByUserEmail(email)
             .orElseThrow(() -> new ResourceNotFoundException("Vendor profile not found for: " + email));
     }
 
@@ -46,6 +48,7 @@ public class VendorController {
 
     @Operation(summary = "Vendor dashboard statistics")
     @GetMapping("/stats")
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getStats(Authentication auth) {
         Vendor vendor = resolveVendor(auth);
         long productCount = productRepository.countByVendorIdAndIsActiveTrue(vendor.getId());
@@ -71,6 +74,7 @@ public class VendorController {
 
     @Operation(summary = "Get vendor's own products")
     @GetMapping("/products")
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getProducts(
         Authentication auth,
         @RequestParam(defaultValue = "0")  int    page,
@@ -95,6 +99,7 @@ public class VendorController {
 
     @Operation(summary = "Create new product")
     @PostMapping("/products")
+    @Transactional
     public ResponseEntity<?> createProduct(
         Authentication auth,
         @Valid @RequestBody ProductRequest req
@@ -132,6 +137,7 @@ public class VendorController {
 
     @Operation(summary = "Update product")
     @PutMapping("/products/{id}")
+    @Transactional
     public ResponseEntity<?> updateProduct(
         Authentication auth,
         @PathVariable Long id,
@@ -160,6 +166,7 @@ public class VendorController {
 
     @Operation(summary = "Delete (soft-deactivate) product")
     @DeleteMapping("/products/{id}")
+    @Transactional
     public ResponseEntity<?> deleteProduct(
         Authentication auth,
         @PathVariable Long id
@@ -179,6 +186,7 @@ public class VendorController {
 
     @Operation(summary = "Get vendor's orders")
     @GetMapping("/orders")
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getOrders(
         Authentication auth,
         @RequestParam(defaultValue = "0")  int    page,
@@ -198,18 +206,110 @@ public class VendorController {
         return ResponseEntity.ok(ordersPage.map(OrderResponse::fromEntity));
     }
 
-    @Operation(summary = "Update order status")
+    // ── BUG FIX: Added @Transactional so the JPA session stays open when
+    // OrderResponse.fromEntity(order) accesses the lazy-loaded `items` collection.
+    // Also fixed resolveVendor (uses findByUserEmail JPQL instead of findAll+stream),
+    // and now stamps updatedAt on every status change.
+    @Operation(summary = "Update order status (enforces next-valid-state)")
     @PatchMapping("/orders/{id}/status")
+    @Transactional
     public ResponseEntity<?> updateOrderStatus(
         Authentication auth,
         @PathVariable Long id,
         @RequestParam String status
     ) {
-        resolveVendor(auth); // ensure caller is a vendor
+        resolveVendor(auth); // ensure caller is an approved vendor
         Order order = orderRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + id));
-        order.setStatus(Order.OrderStatus.valueOf(status.toUpperCase()));
-        orderRepository.save(order);
-        return ResponseEntity.ok(OrderResponse.fromEntity(order));
+
+        Order.OrderStatus newStatus;
+        try {
+            newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "Invalid status value: " + status));
+        }
+
+        Order.OrderStatus current = order.getStatus();
+
+        // Validate allowed forward transitions
+        boolean allowed = switch (current) {
+            case ORDER_PLACED      -> newStatus == Order.OrderStatus.CONFIRMED   || newStatus == Order.OrderStatus.CANCELLED;
+            case CONFIRMED         -> newStatus == Order.OrderStatus.PROCESSING  || newStatus == Order.OrderStatus.CANCELLED;
+            case PROCESSING        -> newStatus == Order.OrderStatus.OUT_FOR_DELIVERY || newStatus == Order.OrderStatus.CANCELLED;
+            case OUT_FOR_DELIVERY  -> newStatus == Order.OrderStatus.DELIVERED;
+            case DELIVERED         -> newStatus == Order.OrderStatus.REFUNDED;   // approve refund directly
+            case REFUND_REQUESTED  -> newStatus == Order.OrderStatus.REFUNDED    || newStatus == Order.OrderStatus.REFUND_REJECTED;
+            default                -> false;
+        };
+
+        if (!allowed) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "Cannot transition from " + current + " to " + newStatus));
+        }
+
+        // If rejecting refund → revert to DELIVERED
+        if (newStatus == Order.OrderStatus.REFUND_REJECTED) {
+            order.setStatus(Order.OrderStatus.DELIVERED);
+            order.setUpdatedAt(LocalDateTime.now());
+            Order saved = orderRepository.save(order);
+            return ResponseEntity.ok(OrderResponse.fromEntity(saved));
+        }
+
+        // If approving refund → restore stock AND update payment status
+        if (newStatus == Order.OrderStatus.REFUNDED) {
+            order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
+            restoreStock(order);
+        }
+
+        // COD: mark as paid when delivered
+        if (newStatus == Order.OrderStatus.DELIVERED && order.getPaymentMethod() == Order.PaymentMethod.COD) {
+            order.setPaymentStatus(Order.PaymentStatus.PAID);
+        }
+
+        // Restore stock on cancel
+        if (newStatus == Order.OrderStatus.CANCELLED && current != Order.OrderStatus.CANCELLED) {
+            restoreStock(order);
+        }
+
+        order.setStatus(newStatus);
+        order.setUpdatedAt(LocalDateTime.now());
+        Order saved = orderRepository.save(order);
+        return ResponseEntity.ok(OrderResponse.fromEntity(saved));
+    }
+
+    // ── Helper: restore product stock from order items ────────────────────────
+    private void restoreStock(Order order) {
+        if (order.getItems() != null) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                if (product != null) {
+                    product.setStockQty(product.getStockQty() + item.getQuantity());
+                    productRepository.save(product);
+                }
+            }
+        }
+    }
+
+    @Operation(summary = "Reject a refund request (reverts order to DELIVERED and sets status REFUND_REJECTED)")
+    @PatchMapping("/orders/{id}/refund/reject")
+    @Transactional
+    public ResponseEntity<?> rejectRefund(
+        Authentication auth,
+        @PathVariable Long id
+    ) {
+        resolveVendor(auth);
+        Order order = orderRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + id));
+
+        if (order.getStatus() != Order.OrderStatus.REFUND_REQUESTED) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "Order is not in REFUND_REQUESTED status"));
+        }
+
+        order.setStatus(Order.OrderStatus.REFUND_REJECTED);
+        order.setUpdatedAt(LocalDateTime.now());
+        Order saved = orderRepository.save(order);
+        return ResponseEntity.ok(OrderResponse.fromEntity(saved));
     }
 }

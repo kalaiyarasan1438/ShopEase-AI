@@ -2,6 +2,19 @@ spring:
   application:
     name: shopeasy-backend
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
   datasource:
     url: jdbc:h2:mem:shopeasy;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
@@ -16,9 +29,10 @@ spring:
     hibernate:
       ddl-auto: update        # use 'validate' in production
     show-sql: false
+    open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
 
   jackson:
@@ -32,16 +46,20 @@ server:
 # ── JWT ───────────────────────────────────────────────────────────
 jwt:
   secret: ${JWT_SECRET:dGhlLXF1aWNrLWJyb3duLWZveC1qdW1wcy1vdmVyLXRoZS1sYXp5LWRvZw==}
-  access-token-expiry-ms:  900000      # 15 minutes
+  access-token-expiry-ms:  86400000    # 24 hours
   refresh-token-expiry-ms: 604800000   # 7 days
 
 # ── CORS ──────────────────────────────────────────────────────────
 cors:
-  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:3000}
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://localhost:3000,http://127.0.0.1:3000}
 
 # ── AI Service ────────────────────────────────────────────────────
 ai:
   service-url: ${AI_SERVICE_URL:http://localhost:8000}
+
+# ── Google OAuth ──────────────────────────────────────────────────
+google:
+  client-id: ${GOOGLE_CLIENT_ID:680459965565-ieft2jign3ci8qnd9dqf4jbrs7dcpidm.apps.googleusercontent.com}
 
 # ── Pagination Defaults ───────────────────────────────────────────
 app:

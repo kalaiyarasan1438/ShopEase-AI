@@ -41,36 +41,45 @@ const cartSlice = createSlice({
   reducers: {
     addToCart(state, action) {
       const { product, quantity = 1 } = action.payload;
-      const existing = state.items.find(i => i.productId === product.id);
+      if (!product || !product.id) return;
+      const productId = Number(product.id);
+      const existing = state.items.find(i => Number(i.productId || i.id) === productId);
+      const numQty = Math.max(1, Number(quantity) || 1);
+
       if (existing) {
-        existing.quantity += quantity;
+        existing.quantity = (Number(existing.quantity) || 0) + numQty;
         toast.success('Quantity updated in cart');
       } else {
         state.items.push({
-          productId:  product.id,
-          name:       product.name,
-          price:      product.price,
-          imageUrl:   product.imageUrl,
-          vendorName: product.vendorName,
-          quantity,
+          productId:  productId,
+          id:         productId,
+          name:       product.name || 'Product',
+          price:      Number(product.price) || 0,
+          imageUrl:   product.imageUrl || '',
+          vendorName: product.vendorName || 'ShopEasy Store',
+          stockQty:   product.stockQty ?? 99,
+          quantity:   numQty,
         });
         toast.success('Added to cart!');
       }
       saveCartToStorage(state.items);
     },
     removeFromCart(state, action) {
-      state.items = state.items.filter(i => i.productId !== action.payload);
+      const targetId = Number(action.payload);
+      state.items = state.items.filter(i => Number(i.productId || i.id) !== targetId);
       saveCartToStorage(state.items);
       toast.success('Removed from cart');
     },
     updateQuantity(state, action) {
       const { productId, quantity } = action.payload;
-      const item = state.items.find(i => i.productId === productId);
+      const targetId = Number(productId);
+      const item = state.items.find(i => Number(i.productId || i.id) === targetId);
       if (item) {
-        if (quantity <= 0) {
-          state.items = state.items.filter(i => i.productId !== productId);
+        const numQty = Number(quantity);
+        if (numQty <= 0) {
+          state.items = state.items.filter(i => Number(i.productId || i.id) !== targetId);
         } else {
-          item.quantity = quantity;
+          item.quantity = numQty;
         }
         saveCartToStorage(state.items);
       }
@@ -85,18 +94,30 @@ const cartSlice = createSlice({
       .addCase(fetchCart.pending, (state) => { state.isLoading = true; })
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.items     = action.payload.items || [];
+        const fetched = action.payload.items || [];
+        state.items = fetched.map(i => ({
+          productId: Number(i.productId || i.id),
+          id:        Number(i.productId || i.id),
+          name:      i.name || i.productName || 'Product',
+          price:     Number(i.price || i.unitPrice) || 0,
+          imageUrl:  i.imageUrl || '',
+          quantity:  Number(i.quantity) || 1,
+        }));
         saveCartToStorage(state.items);
       })
-      .addCase(fetchCart.rejected, (state) => { state.isLoading = false; });
+      .addCase(fetchCart.rejected, (state) => { state.isLoading = false; })
+      .addCase('auth/logout', (state) => {
+        state.items = [];
+        localStorage.removeItem('shopeasy_cart');
+      });
   },
 });
 
 export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
 
 // Selectors
-export const selectCartItems  = (state) => state.cart.items;
-export const selectCartCount  = (state) => state.cart.items.reduce((s, i) => s + i.quantity, 0);
-export const selectCartTotal  = (state) => state.cart.items.reduce((s, i) => s + i.price * i.quantity, 0);
+export const selectCartItems  = (state) => state.cart.items || [];
+export const selectCartCount  = (state) => (state.cart.items || []).reduce((s, i) => s + (Number(i.quantity) || 0), 0);
+export const selectCartTotal  = (state) => (state.cart.items || []).reduce((s, i) => s + (Number(i.price) || 0) * (Number(i.quantity) || 0), 0);
 
 export default cartSlice.reducer;

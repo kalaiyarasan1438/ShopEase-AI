@@ -46,7 +46,22 @@ export default function VendorDashboard() {
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(() => {
+      // Background-only silent refresh for the dashboard (no loading spinner flicker)
+      Promise.all([
+        api.get('/api/vendor/stats'),
+        api.get('/api/vendor/orders?page=0&size=5'),
+        api.get('/api/vendor/products?page=0&size=5'),
+      ]).then(([statsRes, ordersRes, productsRes]) => {
+        setStats(statsRes.data);
+        setRecentOrders(ordersRes.data.content || []);
+        setTopProducts(productsRes.data.content || []);
+      }).catch(() => {}); // silent fail for background polls
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   if (loading) {
     return (

@@ -1,9 +1,32 @@
 // ── Auth ──────────────────────────────────────────────────────────────────────
+export const GMAIL_REGEX = /^[A-Z0-9._%+-]+@gmail\.com$/i;
+export const ADMIN_EMAIL = 'admin@shopeasy.in';
+
 export const emailRules = {
   required: 'Email is required',
-  pattern: {
-    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-    message: 'Please enter a valid email address',
+  validate: (val) => {
+    if (!val) return 'Email is required';
+    const trimmed = val.trim();
+    if (trimmed.toLowerCase() === ADMIN_EMAIL) return true;
+    if (trimmed.toLowerCase().includes('admin') || trimmed.toLowerCase().endsWith('@shopeasy.in') || trimmed.toLowerCase().endsWith('@shopeasy.com')) {
+      return 'Invalid Admin credentials.';
+    }
+    if (!GMAIL_REGEX.test(trimmed)) {
+      return 'Only Gmail addresses (@gmail.com) are allowed';
+    }
+    return true;
+  },
+};
+
+export const gmailOnlyRules = {
+  required: 'Email is required',
+  validate: (val) => {
+    if (!val) return 'Email is required';
+    const trimmed = val.trim();
+    if (!GMAIL_REGEX.test(trimmed)) {
+      return 'Only Gmail addresses (@gmail.com) are allowed';
+    }
+    return true;
   },
 };
 
@@ -47,11 +70,64 @@ export const addressRules = {
   minLength: { value: 5, message: 'Please enter a full address' },
 };
 
+export const getPostalCodeLabel = (country = '') => {
+  const c = String(country || '').trim().toLowerCase();
+  if (c === 'india' || c === 'in') {
+    return 'POSTAL CODE / PIN CODE';
+  }
+  if (c === 'united states' || c === 'us' || c === 'usa') {
+    return 'ZIP CODE';
+  }
+  return 'POSTAL CODE / ZIP CODE';
+};
+
 export const zipRules = {
-  required: 'ZIP code is required',
-  pattern: {
-    value: /^\d{5}(-\d{4})?$/,
-    message: 'Enter a valid ZIP code (e.g. 10001)',
+  required: 'Postal/ZIP code is required',
+  validate: (val, formValues) => {
+    if (!val || !String(val).trim()) return 'Postal/ZIP code is required';
+    const trimmed = String(val).trim();
+    const country = String(formValues?.shippingCountry || '').trim().toLowerCase();
+
+    if (country === 'india' || country === 'in') {
+      if (!/^\d{6}$/.test(trimmed)) {
+        return 'Enter a valid 6-digit PIN code';
+      }
+      return true;
+    }
+
+    if (country === 'united states' || country === 'us' || country === 'usa') {
+      if (!/^\d{5}(-\d{4})?$/.test(trimmed)) {
+        return 'Enter a valid ZIP code (e.g. 10001)';
+      }
+      return true;
+    }
+
+    if (country === 'united kingdom' || country === 'uk' || country === 'gb') {
+      if (!/^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i.test(trimmed)) {
+        return 'Enter a valid UK postal code';
+      }
+      return true;
+    }
+
+    if (country === 'canada' || country === 'ca') {
+      if (!/^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i.test(trimmed)) {
+        return 'Enter a valid Canadian postal code';
+      }
+      return true;
+    }
+
+    if (country === 'australia' || country === 'au') {
+      if (!/^\d{4}$/.test(trimmed)) {
+        return 'Enter a valid 4-digit postal code';
+      }
+      return true;
+    }
+
+    // Default fallback for other countries
+    if (!/^[A-Z0-9\s\-]{3,10}$/i.test(trimmed)) {
+      return 'Enter a valid postal code';
+    }
+    return true;
   },
 };
 

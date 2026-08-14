@@ -78,7 +78,6 @@ shopeasy/
 │   │   │   │   ├── VendorCard.jsx
 │   │   │   │   └── VendorTable.jsx
 │   │   │   └── ai/
-│   │   │       ├── ChatBot.jsx
 │   │   │       └── AIRecommendations.jsx
 │   │   ├── pages/
 │   │   │   ├── Home.jsx

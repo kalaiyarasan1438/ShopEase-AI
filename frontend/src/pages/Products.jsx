@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -13,8 +13,8 @@ import {
 import ProductCard from '@components/product/ProductCard.jsx';
 import Skeleton from '@components/common/Skeleton.jsx';
 import Pagination from '@components/common/Pagination.jsx';
-import { SORT_OPTIONS } from '@utils/constants';
 import { formatCurrency } from '@utils/formatters';
+import { addToCart } from '@store/slices/cartSlice';
 
 export default function Products() {
   const dispatch    = useDispatch();
@@ -26,6 +26,9 @@ export default function Products() {
   const pagination  = useSelector(selectPagination);
   const error       = useSelector(state => state.products.error);
   const [viewMode, setViewMode] = React.useState('grid');
+  const [priceMin, setPriceMin] = React.useState(filters.minPrice || '');
+  const [priceMax, setPriceMax] = React.useState(filters.maxPrice || '');
+  const priceDebounce = useRef(null);
 
   // Sync URL params → filters
   useEffect(() => {
@@ -36,7 +39,6 @@ export default function Products() {
   }, [searchParams]);
 
   const loadProducts = useCallback(() => {
-    const [sortBy, sortDir] = (filters.sortBy + ',' + filters.sortDir).split(',');
     dispatch(fetchProducts({
       page:       pagination.page,
       size:       pagination.size,
@@ -44,6 +46,7 @@ export default function Products() {
       categoryId: filters.categoryId || undefined,
       minPrice:   filters.minPrice   || undefined,
       maxPrice:   filters.maxPrice   || undefined,
+      ratingMin:  filters.ratingMin  || undefined,
       sortBy:     filters.sortBy,
       sortDir:    filters.sortDir,
     }));
@@ -59,19 +62,24 @@ export default function Products() {
 
   useEffect(() => {
     if (error) {
-      console.error('[ShopEasy Products Page Error]', error);
       toast.error(`Failed to load products: ${error}`);
     }
   }, [error]);
 
-  const handleSortChange = (e) => {
-    const [sortBy, sortDir] = e.target.value.split(',');
-    dispatch(setFilters({ sortBy, sortDir }));
-  };
-
   const handleCategoryClick = (catId) => {
     dispatch(setFilters({ categoryId: catId === filters.categoryId ? '' : catId }));
   };
+
+  const handleRatingChange = (e) => {
+    dispatch(setFilters({ ratingMin: e.target.value }));
+  };
+
+  const handlePriceDebounce = useCallback((min, max) => {
+    if (priceDebounce.current) clearTimeout(priceDebounce.current);
+    priceDebounce.current = setTimeout(() => {
+      dispatch(setFilters({ minPrice: min, maxPrice: max }));
+    }, 500);
+  }, [dispatch]);
 
   return (
     <div className="page-enter">
@@ -121,18 +129,45 @@ export default function Products() {
           </button>
         ))}
 
-        {/* Sort */}
-        <div className="ml-auto flex items-center gap-2">
-          <select
-            onChange={handleSortChange}
-            defaultValue="createdAt,desc"
-            className="bg-dark-surface2 border border-dark-border rounded-xl px-3 py-1.5 text-xs text-[var(--text2)] outline-none cursor-pointer hover:border-brand-500/30 transition-colors"
-          >
-            {SORT_OPTIONS.map(o => (
-              <option key={o.value} value={o.value} className="bg-dark-surface1 text-[var(--text)]">{o.label}</option>
-            ))}
-          </select>
+        {/* Rating Filter */}
+        <select
+          value={filters.ratingMin || ''}
+          onChange={handleRatingChange}
+          className="bg-dark-surface2 border border-dark-border rounded-xl px-3 py-1.5 text-xs text-[var(--text2)] outline-none cursor-pointer hover:border-brand-500/30 transition-colors"
+        >
+          <option value="" className="bg-dark-surface1 text-[var(--text)]">All Ratings</option>
+          <option value="4.5" className="bg-dark-surface1 text-[var(--text)]">4.5★ & up</option>
+          <option value="4.0" className="bg-dark-surface1 text-[var(--text)]">4.0★ & up</option>
+          <option value="3.0" className="bg-dark-surface1 text-[var(--text)]">3.0★ & up</option>
+        </select>
 
+        {/* Price Filter — debounced 500ms */}
+        <div className="flex items-center gap-1.5 bg-dark-surface2 border border-dark-border rounded-xl px-2.5 py-1">
+          <input
+            type="number"
+            placeholder="Min ₹"
+            value={priceMin}
+            onChange={(e) => {
+              setPriceMin(e.target.value);
+              handlePriceDebounce(e.target.value, priceMax);
+            }}
+            className="w-16 bg-transparent text-xs text-[var(--text)] outline-none"
+          />
+          <span className="text-gray-400 text-xs">-</span>
+          <input
+            type="number"
+            placeholder="Max ₹"
+            value={priceMax}
+            onChange={(e) => {
+              setPriceMax(e.target.value);
+              handlePriceDebounce(priceMin, e.target.value);
+            }}
+            className="w-16 bg-transparent text-xs text-[var(--text)] outline-none"
+          />
+        </div>
+
+        {/* View Toggle */}
+        <div className="ml-auto flex items-center gap-2">
           {/* View toggle */}
           <div className="flex bg-dark-surface2 border border-dark-border rounded-xl overflow-hidden">
             {[
@@ -203,8 +238,12 @@ export default function Products() {
                   <p className="font-bold text-base text-[var(--text)]">{formatCurrency(product.price)}</p>
                   {product.oldPrice && <p className="text-xs text-gray-400 line-through">{formatCurrency(product.oldPrice)}</p>}
                 </div>
-                <button className="text-xs bg-brand-500 hover:bg-brand-600 text-white font-semibold px-4 py-2 rounded-xl transition-all shadow-sm shadow-brand-500/10">
-                  Add to Cart
+                <button
+                  onClick={(e) => { e.preventDefault(); if (product.stockQty !== 0) dispatch(addToCart({ product, quantity: 1 })); }}
+                  disabled={product.stockQty === 0}
+                  className="text-xs bg-brand-500 hover:bg-brand-600 text-white font-semibold px-4 py-2 rounded-xl transition-all shadow-sm shadow-brand-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {product.stockQty === 0 ? 'Out of Stock' : 'Add to Cart'}
                 </button>
               </div>
             </div>

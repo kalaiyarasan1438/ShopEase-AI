@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Mail, Lock, Building2, MapPin, Phone, FileText, Hash } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { registerUser, selectAuthLoading } from '@store/slices/authSlice';
-import { emailRules, passwordRules, nameRules } from '@utils/validators';
+import { gmailOnlyRules, passwordRules, nameRules, GMAIL_REGEX } from '@utils/validators';
 
 const ROLES = [
   { value: 'USER',   label: 'Shopper',   icon: '👤', desc: 'Browse & buy products' },
@@ -21,6 +22,12 @@ export default function Register() {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
+    const rawEmail = data.email ? data.email.trim() : '';
+    if (!GMAIL_REGEX.test(rawEmail)) {
+      toast.error('Only Gmail addresses (@gmail.com) are allowed.');
+      return;
+    }
+
     const payload = { ...data, role };
 
     // Strip vendor fields if not a vendor
@@ -110,9 +117,9 @@ export default function Register() {
           <div className="relative">
             <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text3)]" />
             <input
-              {...register('email', emailRules)}
+              {...register('email', gmailOnlyRules)}
               type="email"
-              placeholder="alex@example.com"
+              placeholder="alex@gmail.com"
               className="w-full bg-dark-surface2 border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-[var(--text)] placeholder-[var(--text3)] outline-none focus:border-brand-500/60 transition-colors"
             />
           </div>

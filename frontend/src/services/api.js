@@ -77,6 +77,9 @@ api.interceptors.response.use(
           { headers: { 'Content-Type': 'application/json' } }
         );
         localStorage.setItem('accessToken', data.accessToken);
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
         api.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
         processQueue(null, data.accessToken);
         original.headers.Authorization = `Bearer ${data.accessToken}`;
@@ -90,6 +93,19 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
+      }
+    }
+
+    // Retry logic for GET requests (up to 2 retries on network error or 5xx)
+    const isGetMethod = original?.method?.toLowerCase() === 'get';
+    const isNetworkOrServerError = !error.response || (error.response.status >= 500 && error.response.status < 600);
+
+    if (isGetMethod && isNetworkOrServerError) {
+      original._retryCount = (original._retryCount || 0) + 1;
+      if (original._retryCount <= 2) {
+        const delay = original._retryCount * 1000;
+        await new Promise((res) => setTimeout(res, delay));
+        return api(original);
       }
     }
 

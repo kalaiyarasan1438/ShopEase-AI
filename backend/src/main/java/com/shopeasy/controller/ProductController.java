@@ -18,8 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import lombok.extern.slf4j.Slf4j;
+import java.util.stream.Collectors;
 import java.math.BigDecimal;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -40,15 +43,18 @@ public class ProductController {
         @RequestParam(required = false)              String  search,
         @RequestParam(required = false)              Long    categoryId,
         @RequestParam(required = false)              BigDecimal minPrice,
-        @RequestParam(required = false)              BigDecimal maxPrice
+        @RequestParam(required = false)              BigDecimal maxPrice,
+        @RequestParam(required = false)              Double ratingMin
     ) {
         Sort sort = sortDir.equalsIgnoreCase("asc")
             ? Sort.by(sortBy).ascending()
             : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, Math.min(size, 50), sort);
-        return ResponseEntity.ok(
-            productService.getProducts(pageable, search, categoryId, minPrice, maxPrice)
-        );
+        Pageable pageable = PageRequest.of(page, Math.min(size, 1000), sort);
+        Page<ProductResponse> result = productService.getProducts(pageable, search, categoryId, minPrice, maxPrice, ratingMin);
+        log.info("[CHATBOT BACKEND DEBUG] TOTAL PRODUCTS IN DATABASE: {}", result.getTotalElements());
+        log.info("[CHATBOT BACKEND DEBUG] PRODUCTS RETURNED: {}", result.getContent().size());
+        log.info("[CHATBOT BACKEND DEBUG] PRODUCT NAMES: {}", result.getContent().stream().map(ProductResponse::getName).collect(Collectors.joining(", ")));
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Get product by ID")
@@ -60,12 +66,14 @@ public class ProductController {
     @Operation(summary = "Search products")
     @GetMapping("/search")
     public ResponseEntity<Page<ProductResponse>> searchProducts(
-        @RequestParam String q,
+        @RequestParam(required = false) String q,
+        @RequestParam(required = false) String query,
         @RequestParam(defaultValue = "0")  int page,
         @RequestParam(defaultValue = "12") int size
     ) {
+        String searchTerm = (q != null && !q.isBlank()) ? q : (query != null ? query : "");
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(productService.searchProducts(q, pageable));
+        return ResponseEntity.ok(productService.searchProducts(searchTerm, pageable));
     }
 
     @Operation(summary = "Get featured products")

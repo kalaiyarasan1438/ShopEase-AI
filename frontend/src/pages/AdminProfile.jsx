@@ -16,7 +16,7 @@ export default function AdminProfile() {
     defaultValues: {
       firstName: user?.firstName || 'Admin',
       lastName:  user?.lastName  || 'User',
-      email:     user?.email     || 'admin@shopeasy.com',
+      email:     user?.email     || 'admin@shopeasy.in',
       phone:     user?.phone     || '+91 98765 43210',
     }
   });

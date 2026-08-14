@@ -62,7 +62,6 @@ async def root():
         "service": "ShopEasy AI Service",
         "version": "1.0.0",
         "endpoints": {
-            "chat":            "POST /ai/chat",
             "recommendations": "GET  /ai/recommendations",
             "search":          "GET  /ai/search",
             "suggestions":     "GET  /ai/suggestions",

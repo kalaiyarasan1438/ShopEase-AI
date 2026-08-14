@@ -34,6 +34,20 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+export const loginWithOAuth = createAsyncThunk(
+  'auth/oauthLogin',
+  async ({ provider = 'google', idToken }, { rejectWithValue }) => {
+    try {
+      const data = await authService.oauthGoogle(idToken);
+      localStorage.setItem('accessToken',  data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || `${provider} sign-in failed`);
+    }
+  }
+);
+
 export const refreshToken = createAsyncThunk(
   'auth/refresh',
   async (_, { rejectWithValue }) => {
@@ -72,10 +86,7 @@ const initialState = {
   isAuthenticated:   !!localStorage.getItem('accessToken'),
   isLoading:         false,
   error:             null,
-  // authInitialized becomes true once the startup fetchCurrentUser attempt
-  // completes (success OR failure). ProtectedRoute waits for this before
-  // making any redirect decisions.
-  authInitialized:   false,
+  authInitialized:   !localStorage.getItem('accessToken'),
 };
 
 const authSlice = createSlice({
@@ -162,15 +173,12 @@ const authSlice = createSlice({
         state.authInitialized = true;
       })
       .addCase(fetchCurrentUser.rejected, (state) => {
-        // Do NOT clear tokens or logout — the refresh interceptor handles that.
-        // Simply mark initialization complete so the app can proceed.
         state.isLoading       = false;
         state.authInitialized = true;
-        // If there is no token at all, mark as unauthenticated
-        if (!localStorage.getItem('accessToken')) {
-          state.isAuthenticated = false;
-          state.user            = null;
-        }
+        state.isAuthenticated = false;
+        state.user            = null;
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
       });
 
     // Token refresh
@@ -185,6 +193,26 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.authInitialized = true;
       });
+
+    // OAuth login
+    builder
+      .addCase(loginWithOAuth.pending, (state) => {
+        state.isLoading = true;
+        state.error     = null;
+      })
+      .addCase(loginWithOAuth.fulfilled, (state, action) => {
+        state.isLoading       = false;
+        state.user            = action.payload.user;
+        state.accessToken     = action.payload.accessToken;
+        state.isAuthenticated = true;
+        state.authInitialized = true;
+        toast.success(`Welcome back, ${action.payload.user.firstName}!`);
+      })
+      .addCase(loginWithOAuth.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error     = action.payload;
+        toast.error(action.payload);
+      });
   },
 });
 
@@ -196,6 +224,15 @@ export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectAuthLoading     = (state) => state.auth.isLoading;
 export const selectAuthError       = (state) => state.auth.error;
 export const selectAuthInitialized = (state) => state.auth.authInitialized;
-export const selectUserRole        = (state) => state.auth.user?.roles?.[0];
+export const selectUserRole = (state) => {
+  const roles = state.auth.user?.roles;
+  if (!roles) return null;
+  const rawList = Array.isArray(roles) ? roles : Array.from(roles);
+  const roleArray = rawList.map(r => typeof r === 'string' ? r : (r?.name || ''));
+  if (roleArray.some(r => r === 'ADMIN' || r === 'ROLE_ADMIN')) return 'ADMIN';
+  if (roleArray.some(r => r === 'VENDOR' || r === 'ROLE_VENDOR')) return 'VENDOR';
+  if (roleArray.some(r => r === 'USER' || r === 'ROLE_USER')) return 'USER';
+  return roleArray[0] || null;
+};
 
 export default authSlice.reducer;

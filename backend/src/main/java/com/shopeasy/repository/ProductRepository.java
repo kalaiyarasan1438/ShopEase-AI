@@ -24,12 +24,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         AND (:categoryId IS NULL OR c.id = :categoryId)
         AND (:minPrice IS NULL OR p.price >= :minPrice)
         AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+        AND (:ratingMin IS NULL OR p.ratingAvg >= :ratingMin)
     """)
     Page<Product> findWithFilters(
         @Param("search")     String     search,
         @Param("categoryId") Long       categoryId,
         @Param("minPrice")   BigDecimal minPrice,
         @Param("maxPrice")   BigDecimal maxPrice,
+        @Param("ratingMin") Double     ratingMin,
         Pageable pageable
     );
 
@@ -57,4 +59,23 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // Vendor product search
     Page<Product> findByVendorIdAndNameContainingIgnoreCaseAndIsActiveTrue(Long vendorId, String name, Pageable pageable);
+
+    // ── Admin queries ──────────────────────────────────────────────────────
+
+    // Admin: all products including hidden ones
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.category LEFT JOIN FETCH p.vendor ORDER BY p.createdAt DESC")
+    Page<Product> findAllAdmin(Pageable pageable);
+
+    // Low stock across entire platform
+    @Query("SELECT p FROM Product p WHERE p.stockQty <= :threshold AND p.isActive = true ORDER BY p.stockQty ASC")
+    List<Product> findLowStockAll(@Param("threshold") int threshold);
+
+    // Count active products
+    long countByIsActiveTrue();
+
+    // Count hidden products
+    long countByIsActiveFalse();
+
+    // Check by name
+    boolean existsByName(String name);
 }

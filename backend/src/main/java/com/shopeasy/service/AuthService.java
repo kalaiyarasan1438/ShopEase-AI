@@ -1,6 +1,7 @@
 package com.shopeasy.service;
 
 import com.shopeasy.dto.request.LoginRequest;
+import com.shopeasy.dto.request.OAuthRequest;
 import com.shopeasy.dto.request.RefreshTokenRequest;
 import com.shopeasy.dto.request.RegisterRequest;
 import com.shopeasy.dto.response.AuthResponse;
@@ -13,4 +14,9 @@ public interface AuthService {
     UserResponse  getCurrentUser();
     void          forgotPassword(String email);
     void          resetPassword(String token, String newPassword);
+    void          sendForgotPasswordOtp(String email);
+    boolean       verifyOtp(String email, String otp);
+    void          resetPasswordWithOtp(String email, String otp, String newPassword);
+    AuthResponse  loginGoogle(OAuthRequest request);
 }
+

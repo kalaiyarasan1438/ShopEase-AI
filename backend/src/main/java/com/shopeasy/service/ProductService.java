@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductService {
-    Page<ProductResponse> getProducts(Pageable pageable, String search, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice);
+    Page<ProductResponse> getProducts(Pageable pageable, String search, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, Double ratingMin);
     ProductResponse getProductById(Long id);
     Page<ProductResponse> searchProducts(String query, Pageable pageable);
     List<ProductResponse> getFeaturedProducts(int limit);
