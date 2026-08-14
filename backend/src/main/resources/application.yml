@@ -1,6 +1,8 @@
 spring:
   application:
     name: shopeasy-backend
+  config:
+    import: optional:file:.env
 
   mail:
     host: smtp.gmail.com
@@ -16,10 +18,10 @@ spring:
             required: true
 
   datasource:
-    url: jdbc:h2:mem:shopeasy;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ''
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/shopeasy}
+    driver-class-name: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     hikari:
       maximum-pool-size: 10
       minimum-idle: 5
@@ -32,7 +34,7 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
   jackson:
