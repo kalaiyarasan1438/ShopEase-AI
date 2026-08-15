@@ -20,7 +20,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         JOIN FETCH p.category c
         LEFT JOIN FETCH p.vendor v
         WHERE p.isActive = true
-        AND (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', CAST(:search AS String), '%')))
+        AND (:search IS NULL OR (
+            LOWER(p.name) LIKE LOWER(CONCAT('%', CAST(:search AS String), '%')) OR
+            LOWER(p.description) LIKE LOWER(CONCAT('%', CAST(:search AS String), '%')) OR
+            LOWER(c.name) LIKE LOWER(CONCAT('%', CAST(:search AS String), '%'))
+        ))
         AND (:categoryId IS NULL OR c.id = :categoryId)
         AND (:minPrice IS NULL OR p.price >= :minPrice)
         AND (:maxPrice IS NULL OR p.price <= :maxPrice)
