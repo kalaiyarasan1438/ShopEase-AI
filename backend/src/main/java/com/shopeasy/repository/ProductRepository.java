@@ -14,28 +14,44 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // Full-text search across name
-    @Query("""
-        SELECT p FROM Product p
-        JOIN FETCH p.category c
-        LEFT JOIN FETCH p.vendor v
-        WHERE p.isActive = true
-        AND (:search IS NULL OR (
-            LOWER(p.name) LIKE LOWER(CONCAT('%', CAST(:search AS String), '%')) OR
-            LOWER(p.description) LIKE LOWER(CONCAT('%', CAST(:search AS String), '%')) OR
-            LOWER(c.name) LIKE LOWER(CONCAT('%', CAST(:search AS String), '%'))
-        ))
-        AND (:categoryId IS NULL OR c.id = :categoryId)
-        AND (:minPrice IS NULL OR p.price >= :minPrice)
-        AND (:maxPrice IS NULL OR p.price <= :maxPrice)
-        AND (:ratingMin IS NULL OR p.ratingAvg >= :ratingMin)
-    """)
+    // Full-text search across name, description, and category name
+    @Query(
+        value = """
+            SELECT p FROM Product p
+            JOIN p.category c
+            LEFT JOIN p.vendor v
+            WHERE p.isActive = true
+            AND (:search IS NULL OR :search = '' OR (
+                LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')) OR
+                LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%')) OR
+                LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%'))
+            ))
+            AND (:categoryId IS NULL OR c.id = :categoryId)
+            AND (:minPrice IS NULL OR p.price >= :minPrice)
+            AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+            AND (:ratingMin IS NULL OR p.ratingAvg >= :ratingMin)
+        """,
+        countQuery = """
+            SELECT COUNT(p) FROM Product p
+            JOIN p.category c
+            WHERE p.isActive = true
+            AND (:search IS NULL OR :search = '' OR (
+                LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')) OR
+                LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%')) OR
+                LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%'))
+            ))
+            AND (:categoryId IS NULL OR c.id = :categoryId)
+            AND (:minPrice IS NULL OR p.price >= :minPrice)
+            AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+            AND (:ratingMin IS NULL OR p.ratingAvg >= :ratingMin)
+        """
+    )
     Page<Product> findWithFilters(
         @Param("search")     String     search,
         @Param("categoryId") Long       categoryId,
         @Param("minPrice")   BigDecimal minPrice,
         @Param("maxPrice")   BigDecimal maxPrice,
-        @Param("ratingMin") Double     ratingMin,
+        @Param("ratingMin")  Double     ratingMin,
         Pageable pageable
     );
 
