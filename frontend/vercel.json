@@ -12,9 +12,5 @@
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     }
-  ],
-  "env": {
-    "VITE_API_URL": "@shopeasy_api_url",
-    "VITE_AI_API_URL": "@shopeasy_ai_url"
-  }
+  ]
 }
