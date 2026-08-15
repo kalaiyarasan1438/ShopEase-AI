@@ -262,8 +262,21 @@ export default function UserLayout() {
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  const queryName = file.name.split('.')[0].replace(/[-_]/g, ' ');
-                  setSearch(queryName);
+                  const rawName = file.name.split('.')[0];
+                  const cleanKeyword = rawName
+                    .replace(/^(screenshot|img|image|photo|pic|pxl|dcim|win|\d+)+/gi, '')
+                    .replace(/[\-_.]/g, ' ')
+                    .replace(/\b\d+\b/g, '')
+                    .trim();
+
+                  if (cleanKeyword.length >= 2) {
+                    setSearch(cleanKeyword);
+                    navigate(`/products?search=${encodeURIComponent(cleanKeyword)}`);
+                    toast.success(`Image search active for "${cleanKeyword}"`);
+                  } else {
+                    setSearch('');
+                    toast(`📷 Image uploaded! Try typing product terms like 'fashion', 'shoes', or 'electronics'`, { icon: '💡' });
+                  }
                 }
               }}
             />
