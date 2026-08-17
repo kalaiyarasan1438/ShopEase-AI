@@ -1,10 +1,54 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import productService from '@services/productService';
+import { matchProductsByQuery } from '@utils/aiMatcher.js';
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchAll',
-  async (params, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
+      const searchTerm = params?.search ? params.search.trim() : '';
+
+      // If search query is provided, use the shared AI product-matching logic
+      if (searchTerm) {
+        // Fetch product pool
+        const poolResponse = await productService.getProducts({ size: 1000 });
+        const allProducts = Array.isArray(poolResponse) ? poolResponse : (poolResponse?.content || []);
+
+        // Apply AI product matching (same logic as ChatBot)
+        let filtered = matchProductsByQuery(allProducts, searchTerm);
+
+        // Apply explicit UI filter options if present
+        if (params.categoryId) {
+          filtered = filtered.filter(p => (p.category?.id == params.categoryId || p.categoryId == params.categoryId));
+        }
+        if (params.minPrice) {
+          filtered = filtered.filter(p => Number(p.price) >= Number(params.minPrice));
+        }
+        if (params.maxPrice) {
+          filtered = filtered.filter(p => Number(p.price) <= Number(params.maxPrice));
+        }
+        if (params.ratingMin) {
+          filtered = filtered.filter(p => Number(p.ratingAvg || p.rating || 0) >= Number(params.ratingMin));
+        }
+
+        // Paginate results
+        const page = params.page || 0;
+        const size = params.size || 12;
+        const start = page * size;
+        const pagedContent = filtered.slice(start, start + size);
+        const totalElements = filtered.length;
+        const totalPages = Math.ceil(totalElements / size) || 1;
+
+        return {
+          content: pagedContent,
+          number: page,
+          size: size,
+          totalElements: totalElements,
+          totalPages: totalPages,
+        };
+      }
+
+      // Default: fetch directly from backend API
       return await productService.getProducts(params);
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Failed to fetch products');

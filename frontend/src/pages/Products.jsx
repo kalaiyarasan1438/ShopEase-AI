@@ -32,11 +32,10 @@ export default function Products() {
 
   // Sync URL params → filters
   useEffect(() => {
-    const params = {};
-    if (searchParams.get('search'))   params.search   = searchParams.get('search');
-    if (searchParams.get('category')) params.category = searchParams.get('category');
-    if (Object.keys(params).length)   dispatch(setFilters(params));
-  }, [searchParams]);
+    const searchQuery = searchParams.get('search') || '';
+    const categoryQuery = searchParams.get('category') || '';
+    dispatch(setFilters({ search: searchQuery, category: categoryQuery }));
+  }, [searchParams, dispatch]);
 
   const loadProducts = useCallback(() => {
     dispatch(fetchProducts({
