@@ -15,6 +15,48 @@ import aiService from '@services/aiService';
 import { formatCurrency, getStatusConfig } from '@utils/formatters';
 import { parseShoppingIntent, strictFilterProducts } from '@utils/aiMatcher.js';
 
+const QUICK_CHIPS = [
+  'Track my order',
+  'Best deals today',
+  'Recommend products',
+  'Return policy',
+];
+
+const BOT_INTRO = {
+  id: Date.now(),
+  role: 'bot',
+  text: "👋 Hi! I'm ShopEasy AI Assistant. Ask me about specific products, recommendations, specs, order tracking, or shopping advice!",
+  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+};
+
+// ── General Knowledge Q&A Database ─────────────────────────────────────────────
+const GENERAL_QA = [
+  {
+    keywords: ['oled', 'display', 'screen type'],
+    answer: "An **OLED** (Organic Light-Emitting Diode) display uses self-lit pixels where each pixel turns on and off individually. This delivers true, deep blacks, infinite contrast ratio, vibrant colors, and ultra-fast response times compared to traditional LED/LCD screens."
+  },
+  {
+    keywords: ['amoled', 'super amoled'],
+    answer: "**AMOLED** (Active-Matrix OLED) uses a thin-film transistor layer for faster pixel switching, lower power consumption, and higher pixel density—commonly used in modern flagship smartphones."
+  },
+  {
+    keywords: ['ram', 'memory'],
+    answer: "**RAM** (Random Access Memory) is system short-term memory that stores active application data. More RAM allows smoother multitasking, faster switching between apps, and better performance in demanding programs."
+  },
+  {
+    keywords: ['choose a laptop', 'buying advice laptop', 'laptop guide', 'laptop for programming'],
+    answer: "💡 **Key Factors When Choosing a Laptop**:\n1. **Processor (CPU)**: Intel Core i5/i7 (12th+ Gen) or AMD Ryzen 5/7 for performance.\n2. **RAM**: Minimum 16GB for programming, multitasking, or heavy workloads.\n3. **Storage**: At least 512GB NVMe SSD.\n4. **Display**: Full HD IPS or OLED screen with 300+ nits brightness.\n5. **Battery**: 8+ hours battery life for portability."
+  },
+  {
+    keywords: ['return', 'refund', 'policy', 'exchange'],
+    answer: " Our **30-day return policy** lets you return unused items in original packaging within 30 days. You can start a return directly from **My Account → Orders → Return Item**."
+  },
+  {
+    keywords: ['payment', 'pay', 'upi', 'cod'],
+    answer: "💳 We support **Credit/Debit Cards**, **UPI (Google Pay, PhonePe, Paytm)**, **Net Banking**, and **Cash on Delivery**. All online transactions are protected by 256-bit SSL encryption."
+  }
+];
+
 const ChatBot = memo(() => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
