@@ -232,12 +232,12 @@ public class VendorController {
 
         Order.OrderStatus current = order.getStatus();
 
-        // Validate allowed forward transitions
+        // Validate allowed forward transitions (relaxed to allow skipping steps)
         boolean allowed = switch (current) {
-            case ORDER_PLACED      -> newStatus == Order.OrderStatus.CONFIRMED   || newStatus == Order.OrderStatus.CANCELLED;
-            case CONFIRMED         -> newStatus == Order.OrderStatus.PROCESSING  || newStatus == Order.OrderStatus.CANCELLED;
-            case PROCESSING        -> newStatus == Order.OrderStatus.OUT_FOR_DELIVERY || newStatus == Order.OrderStatus.CANCELLED;
-            case OUT_FOR_DELIVERY  -> newStatus == Order.OrderStatus.DELIVERED;
+            case ORDER_PLACED      -> newStatus == Order.OrderStatus.CONFIRMED || newStatus == Order.OrderStatus.PROCESSING || newStatus == Order.OrderStatus.OUT_FOR_DELIVERY || newStatus == Order.OrderStatus.DELIVERED || newStatus == Order.OrderStatus.CANCELLED;
+            case CONFIRMED         -> newStatus == Order.OrderStatus.PROCESSING || newStatus == Order.OrderStatus.OUT_FOR_DELIVERY || newStatus == Order.OrderStatus.DELIVERED || newStatus == Order.OrderStatus.CANCELLED;
+            case PROCESSING        -> newStatus == Order.OrderStatus.OUT_FOR_DELIVERY || newStatus == Order.OrderStatus.DELIVERED || newStatus == Order.OrderStatus.CANCELLED;
+            case OUT_FOR_DELIVERY  -> newStatus == Order.OrderStatus.DELIVERED || newStatus == Order.OrderStatus.CANCELLED;
             case DELIVERED         -> newStatus == Order.OrderStatus.REFUNDED;   // approve refund directly
             case REFUND_REQUESTED  -> newStatus == Order.OrderStatus.REFUNDED    || newStatus == Order.OrderStatus.REFUND_REJECTED;
             default                -> false;
