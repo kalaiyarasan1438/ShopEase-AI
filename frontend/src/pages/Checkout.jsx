@@ -79,6 +79,7 @@ export default function Checkout() {
       cardExpiry: '',
       cardCvv: '',
       cardName: '',
+      upiId: '',
     }
   });
 
@@ -110,6 +111,9 @@ export default function Checkout() {
     } else if (step === 1) {
       if (payment === 'CARD') {
         const isValid = await trigger(['cardNumber', 'cardExpiry', 'cardCvv']);
+        if (isValid) setStep(2);
+      } else if (payment === 'UPI') {
+        const isValid = await trigger(['upiId']);
         if (isValid) setStep(2);
       } else {
         setStep(2);
@@ -339,7 +343,24 @@ export default function Checkout() {
                     </div>
                   )}
 
-                  {payment !== 'CARD' && payment !== 'COD' && (
+                  {payment === 'UPI' && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className={labelCls}>Enter UPI ID</label>
+                        <input 
+                          {...register('upiId', { 
+                            required: 'UPI ID is required',
+                            pattern: { value: /^[\w.-]+@[\w.-]+$/, message: 'Please enter a valid UPI ID (e.g. yourname@upi)' }
+                          })} 
+                          placeholder="Enter your UPI ID (e.g. yourname@upi)" 
+                          className={inputCls} 
+                        />
+                        {errors.upiId && <p className="text-red-500 text-xs mt-1">{errors.upiId.message}</p>}
+                      </div>
+                    </div>
+                  )}
+
+                  {payment !== 'CARD' && payment !== 'COD' && payment !== 'UPI' && (
                     <div className="p-5 bg-dark-surface2 border border-dark-border rounded-2xl text-xs text-[var(--text2)]">
                       Pay securely via <span className="font-bold text-[var(--text)]">{PAYMENT_METHODS.find(m => m.id === payment)?.label}</span> on order placement.
                     </div>

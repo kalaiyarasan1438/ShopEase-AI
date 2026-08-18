@@ -25,8 +25,6 @@ export const SORT_OPTIONS = [
 export const PAYMENT_METHODS = [
   { id: 'CARD',   label: 'Credit / Debit Card', icon: '💳' },
   { id: 'UPI',    label: 'UPI',                 icon: '📱' },
-  { id: 'BANK',   label: 'Net Banking',         icon: '🏦' },
-  { id: 'WALLET', label: 'Wallet',              icon: '💰' },
   { id: 'COD',    label: 'Cash on Delivery',    icon: '💵' },
 ];
 
