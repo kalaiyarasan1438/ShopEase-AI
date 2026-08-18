@@ -29,6 +29,10 @@ export const registerUser = createAsyncThunk(
       }
       return data;
     } catch (err) {
+      if (err.response?.data?.errors) {
+        const firstError = Object.values(err.response.data.errors)[0];
+        return rejectWithValue(firstError);
+      }
       return rejectWithValue(err.response?.data?.message || 'Registration failed');
     }
   }
