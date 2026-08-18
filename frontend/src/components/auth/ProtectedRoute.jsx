@@ -22,6 +22,7 @@ export default function ProtectedRoute({ children, roles = [] }) {
   const authInitialized = useSelector(selectAuthInitialized);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const userRole        = useSelector(selectUserRole);
+  const user            = useSelector((state) => state.auth.user);
   const location        = useLocation();
 
   // Wait until the startup fetchCurrentUser attempt has settled.
@@ -39,7 +40,6 @@ export default function ProtectedRoute({ children, roles = [] }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  const user = useSelector((state) => state.auth.user);
   const userRoles = user?.roles || [];
   const userRoleArray = Array.isArray(userRoles) ? userRoles : Array.from(userRoles);
 
