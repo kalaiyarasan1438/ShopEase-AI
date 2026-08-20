@@ -93,11 +93,11 @@ export default function Products() {
 
       {/* Error banner */}
       {error && (
-        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-2xl text-red-500 text-sm font-semibold">
-          ⚠️ Connection/API Error: {error.toString()}
-          <p className="text-xs text-red-400 font-normal mt-1">
-            Please make sure the Spring Boot backend is active on port 8080 and CORS is allowed.
-          </p>
+        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-2xl text-red-500 text-sm flex flex-col gap-1">
+          <span className="font-semibold">⚠️ Connection/API Error: {error}</span>
+          <span className="text-xs text-red-400 opacity-90">
+            If you are using a free hosting service like Render, the backend server may have gone to sleep. Please wait about 60 seconds and refresh the page to allow the server to wake up.
+          </span>
         </div>
       )}
 
