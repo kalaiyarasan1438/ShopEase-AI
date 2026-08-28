@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Mail, Lock, Building2, MapPin, Phone, FileText, Hash } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { registerUser, selectAuthLoading } from '@store/slices/authSlice';
+import { registerUser, selectAuthLoading, selectServerWaking } from '@store/slices/authSlice';
 import { gmailOnlyRules, passwordRules, nameRules, GMAIL_REGEX } from '@utils/validators';
 
 const ROLES = [
@@ -16,7 +16,8 @@ const ROLES = [
 export default function Register() {
   const dispatch  = useDispatch();
   const navigate  = useNavigate();
-  const isLoading = useSelector(selectAuthLoading);
+  const isLoading    = useSelector(selectAuthLoading);
+  const serverWaking = useSelector(selectServerWaking);
   const [role, setRole] = useState('USER');
 
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -62,6 +63,14 @@ export default function Register() {
         <h1 className="text-2xl font-bold tracking-tight text-[var(--text)]">Create account</h1>
         <p className="text-[var(--text3)] text-sm mt-1">Join thousands of shoppers & vendors</p>
       </div>
+
+      {/* Server wake up banner */}
+      {serverWaking && (
+        <div className="mb-4 px-4 py-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-400 text-xs font-medium flex items-center gap-2.5 animate-pulse">
+          <div className="w-4 h-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin flex-shrink-0" />
+          <span>⚡ {serverWaking}</span>
+        </div>
+      )}
 
       {/* Role selector */}
       <div className="mb-5">
@@ -240,7 +249,7 @@ export default function Register() {
           className="w-full bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
         >
           {isLoading ? (
-            <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Creating…</>
+            <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />{serverWaking ? 'Server is starting…' : 'Creating…'}</>
           ) : role === 'VENDOR' ? '🏪 Register as Vendor' : '🚀 Create Account'}
         </button>
       </form>

@@ -2,27 +2,60 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authService from '@services/authService';
 import toast from 'react-hot-toast';
 
+// Helper to execute API calls with automatic retry when server is waking up on Render
+const withServerWakeupRetry = async (apiCall, dispatch, maxAttempts = 12, delayMs = 3000) => {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const data = await apiCall();
+      dispatch(setServerWaking(null));
+      return data;
+    } catch (err) {
+      // If server returned a 4xx error (e.g., 401 Bad Credentials, 400 Bad Request, 403 Forbidden, 404 Not Found),
+      // it means the server is UP and active. Do not retry!
+      if (err.response && err.response.status >= 400 && err.response.status < 500) {
+        dispatch(setServerWaking(null));
+        throw err;
+      }
+
+      // Check if it is a network error, timeout, 502/503/504 Bad Gateway (Render sleeping)
+      const isNetworkOrServerError =
+        !err.response ||
+        (err.response.status >= 500 && err.response.status <= 504) ||
+        err.code === 'ECONNABORTED' ||
+        err.message?.includes('Network Error');
+
+      if (isNetworkOrServerError && attempt < maxAttempts) {
+        dispatch(setServerWaking(`Server is starting up, please wait... (Attempt ${attempt}/${maxAttempts})`));
+        await new Promise((res) => setTimeout(res, delayMs));
+      } else {
+        dispatch(setServerWaking(null));
+        throw err;
+      }
+    }
+  }
+};
+
 // ── Async Thunks ──────────────────────────────────────────────────────────────
 
 export const loginUser = createAsyncThunk(
   'auth/login',
-  async (credentials, { rejectWithValue }) => {
+  async (credentials, { rejectWithValue, dispatch }) => {
     try {
-      const data = await authService.login(credentials);
+      const data = await withServerWakeupRetry(() => authService.login(credentials), dispatch);
       localStorage.setItem('accessToken',  data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
       return data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Login failed');
+      return rejectWithValue(err.response?.data?.message || err.message || 'Login failed');
     }
   }
 );
 
 export const registerUser = createAsyncThunk(
   'auth/register',
-  async (payload, { rejectWithValue }) => {
+  async (payload, { rejectWithValue, dispatch }) => {
     try {
-      const data = await authService.register(payload);
+      const data = await withServerWakeupRetry(() => authService.register(payload), dispatch);
       if (data.accessToken) {
         localStorage.setItem('accessToken',  data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
@@ -33,21 +66,21 @@ export const registerUser = createAsyncThunk(
         const firstError = Object.values(err.response.data.errors)[0];
         return rejectWithValue(firstError);
       }
-      return rejectWithValue(err.response?.data?.message || 'Registration failed');
+      return rejectWithValue(err.response?.data?.message || err.message || 'Registration failed');
     }
   }
 );
 
 export const loginWithOAuth = createAsyncThunk(
   'auth/oauthLogin',
-  async ({ provider = 'google', idToken }, { rejectWithValue }) => {
+  async ({ provider = 'google', idToken }, { rejectWithValue, dispatch }) => {
     try {
-      const data = await authService.oauthGoogle(idToken);
+      const data = await withServerWakeupRetry(() => authService.oauthGoogle(idToken), dispatch);
       localStorage.setItem('accessToken',  data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
       return data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || `${provider} sign-in failed`);
+      return rejectWithValue(err.response?.data?.message || err.message || `${provider} sign-in failed`);
     }
   }
 );
@@ -71,9 +104,9 @@ export const refreshToken = createAsyncThunk(
 
 export const fetchCurrentUser = createAsyncThunk(
   'auth/me',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      return await authService.getCurrentUser();
+      return await withServerWakeupRetry(() => authService.getCurrentUser(), dispatch, 8, 2500);
     } catch (err) {
       // Do NOT logout here — let the Axios interceptor handle token refresh.
       // Only signal failure so callers know initialization is done.
@@ -89,6 +122,7 @@ const initialState = {
   accessToken:       localStorage.getItem('accessToken') || null,
   isAuthenticated:   !!localStorage.getItem('accessToken'),
   isLoading:         false,
+  serverWaking:      null,
   error:             null,
   authInitialized:   !localStorage.getItem('accessToken'),
 };
@@ -102,27 +136,35 @@ const authSlice = createSlice({
       state.accessToken     = null;
       state.isAuthenticated = false;
       state.authInitialized = true; // stay initialized so routes don't hang
+      state.serverWaking    = null;
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
     },
     clearError(state) {
-      state.error = null;
+      state.error        = null;
+      state.serverWaking = null;
+    },
+    setServerWaking(state, action) {
+      state.serverWaking = action.payload;
     },
     setCredentials(state, action) {
       state.user            = action.payload.user;
       state.accessToken     = action.payload.accessToken;
       state.isAuthenticated = true;
+      state.serverWaking    = null;
     },
   },
   extraReducers: (builder) => {
     // Login
     builder
       .addCase(loginUser.pending, (state) => {
-        state.isLoading = true;
-        state.error     = null;
+        state.isLoading    = true;
+        state.error        = null;
+        state.serverWaking = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading       = false;
+        state.serverWaking    = null;
         state.user            = action.payload.user;
         state.accessToken     = action.payload.accessToken;
         state.isAuthenticated = true;
@@ -130,19 +172,22 @@ const authSlice = createSlice({
         toast.success(`Welcome back, ${action.payload.user.firstName}!`);
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error     = action.payload;
+        state.isLoading    = false;
+        state.serverWaking = null;
+        state.error        = action.payload;
         toast.error(action.payload);
       });
 
     // Register
     builder
       .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
-        state.error     = null;
+        state.isLoading    = true;
+        state.error        = null;
+        state.serverWaking = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isLoading    = false;
+        state.serverWaking = null;
         const { user, accessToken } = action.payload;
         if (accessToken) {
           // Normal shopper
@@ -159,8 +204,9 @@ const authSlice = createSlice({
         }
       })
       .addCase(registerUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error     = action.payload;
+        state.isLoading    = false;
+        state.serverWaking = null;
+        state.error        = action.payload;
         toast.error(action.payload);
       });
 
@@ -172,12 +218,14 @@ const authSlice = createSlice({
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.isLoading       = false;
+        state.serverWaking    = null;
         state.user            = action.payload;
         state.isAuthenticated = true;
         state.authInitialized = true;
       })
       .addCase(fetchCurrentUser.rejected, (state) => {
         state.isLoading       = false;
+        state.serverWaking    = null;
         state.authInitialized = true;
         state.isAuthenticated = false;
         state.user            = null;
@@ -196,16 +244,19 @@ const authSlice = createSlice({
         state.accessToken     = null;
         state.isAuthenticated = false;
         state.authInitialized = true;
+        state.serverWaking    = null;
       });
 
     // OAuth login
     builder
       .addCase(loginWithOAuth.pending, (state) => {
-        state.isLoading = true;
-        state.error     = null;
+        state.isLoading    = true;
+        state.error        = null;
+        state.serverWaking = null;
       })
       .addCase(loginWithOAuth.fulfilled, (state, action) => {
         state.isLoading       = false;
+        state.serverWaking    = null;
         state.user            = action.payload.user;
         state.accessToken     = action.payload.accessToken;
         state.isAuthenticated = true;
@@ -213,19 +264,21 @@ const authSlice = createSlice({
         toast.success(`Welcome back, ${action.payload.user.firstName}!`);
       })
       .addCase(loginWithOAuth.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error     = action.payload;
+        state.isLoading    = false;
+        state.serverWaking = null;
+        state.error        = action.payload;
         toast.error(action.payload);
       });
   },
 });
 
-export const { logout, clearError, setCredentials } = authSlice.actions;
+export const { logout, clearError, setCredentials, setServerWaking } = authSlice.actions;
 
 // ── Selectors ─────────────────────────────────────────────────────────────────
 export const selectCurrentUser     = (state) => state.auth.user;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectAuthLoading     = (state) => state.auth.isLoading;
+export const selectServerWaking    = (state) => state.auth.serverWaking;
 export const selectAuthError       = (state) => state.auth.error;
 export const selectAuthInitialized = (state) => state.auth.authInitialized;
 export const selectUserRole = (state) => {

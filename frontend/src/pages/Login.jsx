@@ -10,6 +10,7 @@ import {
   loginWithOAuth,
   selectAuthLoading,
   selectAuthError,
+  selectServerWaking,
 } from '@store/slices/authSlice';
 import { emailRules, GMAIL_REGEX, ADMIN_EMAIL } from '@utils/validators';
 
@@ -51,8 +52,9 @@ export default function Login() {
   const dispatch  = useDispatch();
   const navigate  = useNavigate();
   const location  = useLocation();
-  const isLoading = useSelector(selectAuthLoading);
-  const authError = useSelector(selectAuthError);
+  const isLoading    = useSelector(selectAuthLoading);
+  const authError    = useSelector(selectAuthError);
+  const serverWaking = useSelector(selectServerWaking);
 
   const [showPwd, setShowPwd]           = useState(false);
   const [oauthLoading, setOAuthLoading] = useState(false);
@@ -175,8 +177,13 @@ export default function Login() {
         <p className="text-[var(--text3)] text-sm mt-1">Sign in to your ShopEasy account</p>
       </div>
 
-      {/* Server error banner */}
-      {authError && (
+      {/* Server error & wake up banner */}
+      {serverWaking ? (
+        <div className="mb-4 px-4 py-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-400 text-xs font-medium flex items-center gap-2.5 animate-pulse">
+          <div className="w-4 h-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin flex-shrink-0" />
+          <span>⚡ {serverWaking}</span>
+        </div>
+      ) : authError && (
         <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
           {authError}
         </div>
@@ -240,7 +247,7 @@ export default function Login() {
           {isLoading ? (
             <>
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Signing in…
+              {serverWaking ? 'Server is starting…' : 'Signing in…'}
             </>
           ) : (
             '🔐 Sign In'
