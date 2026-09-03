@@ -1730,17 +1730,24 @@ public class DataSeeder implements CommandLineRunner {
             if (productRepository.existsByName(name)) {
                 Product existing = productRepository.findByName(name).orElse(null);
                 if (existing != null) {
-                    boolean needsImageUpdate = existing.getImages().isEmpty() || existing.getImages().stream()
-                        .anyMatch(img -> img.getImageUrl() == null || img.getImageUrl().contains("m.media-amazon.com"));
-                    if (needsImageUpdate) {
-                        existing.getImages().clear();
-                        existing.getImages().add(ProductImage.builder().product(existing).imageUrl(imgUrl).isPrimary(true).sortOrder(0).build());
-                        existing.getImages().add(ProductImage.builder().product(existing).imageUrl(thumbUrl).isPrimary(false).sortOrder(1).build());
-                        existing.getImages().add(ProductImage.builder().product(existing).imageUrl(g1).isPrimary(false).sortOrder(2).build());
-                        existing.getImages().add(ProductImage.builder().product(existing).imageUrl(g2).isPrimary(false).sortOrder(3).build());
-                        existing.getImages().add(ProductImage.builder().product(existing).imageUrl(g3).isPrimary(false).sortOrder(4).build());
-                        productRepository.save(existing);
+                    String[] newUrls = {imgUrl, thumbUrl, g1, g2, g3};
+                    List<ProductImage> imgs = existing.getImages();
+                    if (imgs != null && !imgs.isEmpty()) {
+                        for (int i = 0; i < imgs.size() && i < newUrls.length; i++) {
+                            imgs.get(i).setImageUrl(newUrls[i]);
+                        }
+                    } else {
+                        if (existing.getImages() == null) existing.setImages(new ArrayList<>());
+                        for (int i = 0; i < newUrls.length; i++) {
+                            existing.getImages().add(ProductImage.builder()
+                                .product(existing)
+                                .imageUrl(newUrls[i])
+                                .isPrimary(i == 0)
+                                .sortOrder(i)
+                                .build());
+                        }
                     }
+                    productRepository.save(existing);
                 }
                 continue;
             }
