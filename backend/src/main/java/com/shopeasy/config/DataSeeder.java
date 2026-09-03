@@ -330,6 +330,259 @@ public class DataSeeder implements CommandLineRunner {
             "https://5.imimg.com/data5/SELLER/Default/2020/8/JC/UN/AB/52782818/dsc00249-500x500.JPG",
             "https://image.made-in-china.com/2f0j00NMbcfOjGLBoY/Premium-Quality-Rl-18-Inch-Selfie-Ring-Light-Portable-LED-Photography-Ring-Light-Lamp-Video-Light-with-Tripod-Stand-Wholesale.webp"
         });
+
+        // ── 10 LAPTOPS ──────────────────────────────────────────────
+        defs.add(new String[]{"Apple MacBook Pro 16 M3 Max", "349900", "399900", "Top Rated",
+            "Apple M3 Max chip with 16-core CPU and 40-core GPU, 36GB Unified Memory, 1TB SSD, 16.2-inch Liquid Retina XDR display",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/61bwiPR74BL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61vFO3R5UNL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71Y74s4v-gL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/81x2Lz5J52L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Dell XPS 15 OLED Laptop", "189990", "219990", "Best Seller",
+            "13th Gen Intel Core i9-13900H, 32GB DDR5 RAM, 1TB NVMe SSD, NVIDIA GeForce RTX 4060, 15.6-inch 3.5K OLED Touch screen",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71a+-J2x9XL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71j-G5n5HCL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71N-E3t9-mL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61nQ+1k5S0L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71r5E3n8H8L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"HP Spectre x360 14 Convertible", "134990", "159990", "Hot Deal",
+            "Intel Core Ultra 7 155H, 16GB LPDDR5x RAM, 1TB PCIe Gen4 SSD, 14-inch 2.8K 120Hz OLED Touch 2-in-1 laptop with Stylus",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71DkY2Z92UL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71e-S7p91bL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71N5B1n2nHL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61b7k1n7nBL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71P7N1k1nHL._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Lenovo ThinkPad X1 Carbon Gen 12", "164990", "189990", "New",
+            "Intel Core Ultra 7 165H, 32GB LPDDR5X RAM, 1TB SSD, 14-inch 2.8K OLED anti-glare display, Carbon Fiber ultralight design",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/61N+3k91bGL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71e8+P91bGL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61N7+2n1bGL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71N8+3n1bGL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61P9+4n1bGL._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"ASUS ROG Zephyrus G16 Gaming Laptop", "179990", "209990", "Trending",
+            "Intel Core Ultra 9 185H, NVIDIA RTX 4070 8GB, 32GB LPDDR5X, 1TB SSD, 16-inch 2.5K 240Hz OLED ROG Nebula display",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71k+2b72p2L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71j+3c73p3L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61l+4d74p4L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71m+5e75p5L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61n+6f76p6L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Acer Predator Helios 16 Gaming Laptop", "144990", "169990", "Hot Deal",
+            "14th Gen Intel Core i7-14700HX, NVIDIA RTX 4070 8GB, 16GB DDR5, 1TB SSD, 16-inch WQXGA 240Hz IPS Gaming Display",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71m8p3Q82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71n9q4R93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61o0r5S04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71p1s6T15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61q2t7U26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Apple MacBook Air 15 M3", "124900", "139900", "Best Seller",
+            "Apple M3 chip, 16GB Unified Memory, 512GB SSD, 15.3-inch Liquid Retina display, 18-hour battery life, Midnight color",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71S33vDOm6L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71S7-G99p4L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61P9-H00q5L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71Q0-I11r6L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/81R1-J22s7L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Samsung Galaxy Book4 Pro 360", "159990", "179990", "New",
+            "Intel Core Ultra 7, 16GB LPDDR5X, 1TB SSD, 16-inch 3K Dynamic AMOLED 2X 120Hz Touchscreen, S-Pen included",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71N5P2Q82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71O6Q3R93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61P7R4S04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71Q8S5T15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61R9T6U26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"MSI Stealth 16 AI Studio Laptop", "199990", "229990", "Top Rated",
+            "Intel Core Ultra 9 185H, NVIDIA RTX 4080 12GB, 32GB DDR5, 2TB SSD, 16-inch UHD+ 120Hz MiniLED display, Magnesium alloy",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71N8k2A82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71O9l3B93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61P0m4C04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71Q1n5D15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61R2o6E26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"LG Gram 17 Ultra-Light Laptop", "129990", "149990", null,
+            "Intel Core Ultra 7, 16GB LPDDR5X, 1TB Gen4 SSD, 17-inch WQXGA IPS 16:10 display, 77Wh battery, ultra-lightweight 1.35kg",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71N9k3A82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71O0l4B93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61P1m5C04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71Q2n6D15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61R3o7E26-L._AC_SL1500_.jpg"
+        });
+
+        // ── 10 MOBILE PHONES ────────────────────────────────────────
+        defs.add(new String[]{"Apple iPhone 15 Pro Max", "149900", "159900", "Best Seller",
+            "A17 Pro chip with 6-core GPU, Titanium design with textured matte glass back, 48MP Main camera with 5x optical zoom",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/81sighvA3VLC._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71tCOhLIG7L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71657TiFeHL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/81c50PU+SPL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61H+V3B216L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Samsung Galaxy S24 Ultra 5G", "129999", "139999", "Hot Deal",
+            "Snapdragon 8 Gen 3 for Galaxy, 200MP camera with Galaxy AI feature suite, built-in S-Pen, 12GB RAM 256GB Storage",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71CXhVHPmdL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71h38-7mYWL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61S-739kGFL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71U8-49mZWL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61V9-50maWL._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Google Pixel 8 Pro 5G", "99999", "106999", "Top Rated",
+            "Google Tensor G3 chip, 6.7-inch Super Actua 120Hz display, Pro triple rear camera with AI Magic Eraser & Best Take",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71n5Fw3bKqL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71o6Gx4cLrL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61p7Hy5dMsL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71q8Iz6eNtL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61r9JA7fOuL._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"OnePlus 12 5G Smartphone", "64999", "69999", "Trending",
+            "Snapdragon 8 Gen 3, 4th Gen Hasselblad Camera for Mobile, 5400mAh battery with 100W SUPERVOOC, 16GB RAM 512GB",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/717Qo4MH97L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/718Rp5NI08L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/619Sq6OJ19L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/710Tr7PK20L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/611Us8QL21L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Xiaomi 14 Ultra 5G", "99999", "119999", "New",
+            "Leica Quad Camera System with 1-inch Sony LYT-900 sensor, Snapdragon 8 Gen 3, 90W HyperCharge, WQHD+ 120Hz AMOLED",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71M8b2P82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71N9c3Q93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61O0d4R04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71P1e5S15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61Q2f6T26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Vivo X100 Pro 5G", "89999", "96999", "Hot Deal",
+            "ZEISS APO Telephoto Camera, MediaTek Dimensity 9300 chipset, Vivo V3 Imaging Chip, 5400mAh battery with 100W FlashCharge",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71O8b2P82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71P9c3Q93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61Q0d4R04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71R1e5S15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61S2f6T26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"iQOO 12 5G Gaming Smartphone", "52999", "59999", "Best Seller",
+            "Snapdragon 8 Gen 3, Supercomputing Chip Q1 for esports gaming, 144Hz LTPO AMOLED display, 120W FlashCharge, 16GB RAM",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71P8b2P82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71Q9c3Q93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61R0d4R04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71S1e5S15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61T2f6T26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Motorola Edge 50 Ultra 5G", "59999", "64999", "New",
+            "Real Wood back casing, Snapdragon 8s Gen 3, 50MP Triple Camera with 100x AI Super Zoom, 125W TurboPower charging",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71Q8b2P82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71R9c3Q93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61S0d4R04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71T1e5S15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61U2f6T26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Nothing Phone (2a) 5G", "23999", "25999", "Hot Deal",
+            "Transparent Glyph Interface back design, MediaTek Dimensity 7200 Pro, 50MP Dual Camera, 120Hz flexible AMOLED display",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71R8b2P82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71S9c3Q93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61T0d4R04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71U1e5S15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61V2f6T26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Realme GT 6 5G Smartphone", "39999", "44999", null,
+            "Snapdragon 8s Gen 3, 6000 nits Ultra Bright 120Hz Display, Sony LYT-808 OIS main camera, 120W SUPERVOOC charging",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71S8b2P82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71T9c3Q93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61U0d4R04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71V1e5S15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61W2f6T26-L._AC_SL1500_.jpg"
+        });
+
+        // ── 5 SMART WATCHES ─────────────────────────────────────────
+        defs.add(new String[]{"Apple Watch Ultra 2 GPS + Cellular", "89900", "94900", "Top Rated",
+            "49mm Corrosion-Resistant Titanium Case, S9 SiP, Double Tap gesture control, 3000 nits display, 36-hour battery life",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71XMTL52enL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71Y8+E11rL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61Z9+F22sL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71a0+G33tL._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/81b1+H44uL._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Samsung Galaxy Watch6 Classic 47mm", "36999", "42999", "Best Seller",
+            "Iconic Rotating Physical Bezel, BioActive Sensor for ECG & Blood Pressure, Sapphire Crystal glass, Wear OS powered by Samsung",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71T8b2P82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71U9c3Q93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61V0d4R04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71W1e5S15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61X2f6T26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Garmin Fenix 7 Pro Sapphire Solar", "81990", "92990", "New",
+            "Multisport GPS smartwatch with Solar charging lens, built-in LED flashlight, endurance score, and Sapphire crystal display",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71U8b2P82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71V9c3Q93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61W0d4R04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71X1e5S15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61Y2f6T26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Amazfit Balance Smart Watch", "20999", "24999", "Hot Deal",
+            "Body Composition & Readiness Analysis, Dual-Band Circularly Polarized GPS, Zepp OS 3.0, 14-Day Battery Life, HD AMOLED",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71V8b2P82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71W9c3Q93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61X0d4R04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71Y1e5S15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61Z2f6T26-L._AC_SL1500_.jpg"
+        });
+
+        defs.add(new String[]{"Noise ColorFit Pro 5 Max Smartwatch", "4999", "7999", "Trending",
+            "1.96-inch AMOLED Display, Posture & Fall Detection alerts, Bluetooth Calling with Tru Sync, 100+ Sports Modes & Watch Faces",
+            "Electronics",
+            "https://m.media-amazon.com/images/I/71W8b2P82-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71X9c3Q93-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61Y0d4R04-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/71Z1e5S15-L._AC_SL1500_.jpg",
+            "https://m.media-amazon.com/images/I/61a2f6T26-L._AC_SL1500_.jpg"
+        });
           defs.add(new String[]{"Keratin Hair Straightener", "5499", "8499", "Hot Deal",
             "Ceramic plates, adjustable temp, anti-static, auto shut-off",
             "Electronics",
