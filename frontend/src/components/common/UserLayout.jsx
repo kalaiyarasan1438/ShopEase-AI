@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -35,12 +35,19 @@ const USER_NAV = [
 export default function UserLayout() {
   const dispatch    = useDispatch();
   const navigate    = useNavigate();
+  const location    = useLocation();
   const user        = useSelector(selectCurrentUser);
   const cartCount   = useSelector(selectCartCount);
   const wishCount   = useSelector(selectWishlistCount);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [search,      setSearch]      = useState('');
+
+  // Sync header search input with URL query param
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setSearch(params.get('search') || '');
+  }, [location.search]);
   const [notifOpen,   setNotifOpen]   = useState(false);
   const [activeOrderCount, setActiveOrderCount] = useState(0);
   const [isListening, setIsListening] = useState(false);

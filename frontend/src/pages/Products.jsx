@@ -1,14 +1,14 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Grid, List, Filter } from 'lucide-react';
+import { Grid, List, Filter, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   fetchProducts, fetchCategories,
   selectProducts, selectCategories, selectProductsLoading,
   selectProductFilters, selectPagination,
-  setFilters, setPage,
+  setFilters, setPage, clearFilters,
 } from '@store/slices/productSlice';
 import ProductCard from '@components/product/ProductCard.jsx';
 import Skeleton from '@components/common/Skeleton.jsx';
@@ -18,6 +18,7 @@ import { addToCart } from '@store/slices/cartSlice';
 
 export default function Products() {
   const dispatch    = useDispatch();
+  const navigate    = useNavigate();
   const [searchParams] = useSearchParams();
   const products    = useSelector(selectProducts);
   const categories  = useSelector(selectCategories);
@@ -80,15 +81,34 @@ export default function Products() {
     }, 500);
   }, [dispatch]);
 
+  const handleClearSearch = () => {
+    setPriceMin('');
+    setPriceMax('');
+    dispatch(clearFilters());
+    navigate('/products', { replace: true });
+  };
+
   return (
     <div className="page-enter">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-[var(--text)]">Products</h1>
-        <p className="text-gray-500 text-sm mt-1">
-          {isLoading ? 'Loading…' : `${pagination.totalElements.toLocaleString()} products found`}
-          {filters.search && <span className="ml-1">for "<span className="text-brand-500 font-bold">{filters.search}</span>"</span>}
-        </p>
+        <div className="flex items-center gap-3 mt-1">
+          <p className="text-gray-500 text-sm">
+            {isLoading ? 'Loading…' : `${pagination.totalElements.toLocaleString()} products found`}
+            {filters.search && <span className="ml-1">for "<span className="text-brand-500 font-bold">{filters.search}</span>"</span>}
+          </p>
+          {filters.search && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="px-2.5 py-1 text-xs font-semibold text-gray-400 hover:text-red-500 bg-dark-surface2 hover:bg-red-500/10 border border-dark-border hover:border-red-500/30 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+              title="Clear search"
+            >
+              <X size={12} /> Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Error banner */}
@@ -198,7 +218,8 @@ export default function Products() {
           <h3 className="text-lg font-semibold mb-2 text-[var(--text)]">No products found</h3>
           <p className="text-gray-500 text-sm">Try adjusting your filters or search query.</p>
           <button
-            onClick={() => dispatch(setFilters({ search: '', categoryId: '' }))}
+            type="button"
+            onClick={handleClearSearch}
             className="mt-4 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold rounded-xl transition-all shadow-sm shadow-brand-500/10"
           >
             Clear Filters
