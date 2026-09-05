@@ -335,254 +335,205 @@ public class DataSeeder implements CommandLineRunner {
         defs.add(new String[]{"Apple MacBook Pro 16 M3 Max", "149900", "199900", "Top Rated",
             "Apple M3 Max chip with 16-core CPU and 40-core GPU, 36GB Unified Memory, 1TB SSD, 16.2-inch Liquid Retina XDR display",
             "Electronics",
-            "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&auto=format&fit=crop&q=80"
+            "https://static0.xdaimages.com/wordpress/wp-content/uploads/2023/11/macbook-pro-m3-max-xda-review08761.jpg",
+            "https://techcrunch.com/wp-content/uploads/2023/11/CMC_7492.jpg",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrtmi_ricmlLW8ylsER0OCrWHhv5P6eP2BRDQQNRht3So-UjBvckvzmovz&s=10"
         });
 
         defs.add(new String[]{"Dell XPS 15 OLED Laptop", "89990", "99990", "Best Seller",
             "13th Gen Intel Core i9-13900H, 32GB DDR5 RAM, 1TB NVMe SSD, NVIDIA GeForce RTX 4060, 15.6-inch 3.5K OLED Touch screen",
             "Electronics",
-            "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800&auto=format&fit=crop&q=80"
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTjEJzy4YHhEzxkZX-vz24NzTAJuv33GKrgoO84oKYRPk7WEddxeuyDrEb&s=10",
+            "https://cdn.mos.cms.futurecdn.net/v2/t:0,l:250,cw:1500,ch:1125,q:80,w:1500/i9uqYMDvNi3YzSLFJqDw9.jpg",
+            "https://looper-static.s3.us-east-1.amazonaws.com/engadget/dell-xps-15-oled-review-practically-perfect-15-inch-screen-laptop-120033751-120033287/l-6fdc9810-1c97-11ec-bdee-906c9fdf6fc4.jpg"
         });
 
         defs.add(new String[]{"HP Spectre x360 14 Convertible", "74990", "89990", "Hot Deal",
             "Intel Core Ultra 7 155H, 16GB LPDDR5x RAM, 1TB PCIe Gen4 SSD, 14-inch 2.8K 120Hz OLED Touch 2-in-1 laptop with Stylus",
             "Electronics",
-            "https://images.unsplash.com/photo-1544731612-de7f96afe55f?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1544731612-de7f96afe55f?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1544731612-de7f96afe55f?w=800&auto=format&fit=crop&q=80"
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYfmxN3_OcAAd88ZMnryQ8iY9xmab_O1wU4CJt-Pgi-qZDIpB9N9jBhMHi&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREpHJsw5_XXW4wgyYX6PUavNz9n6gZ1NHe0UNgFVO4vLsJ4mtobGycxDI&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1HpPrcooCq653qSL7LJYxHY4It_9idMx-kVaX3U-V7S0wLGOeFWdOOx8&s=10"
         });
 
         defs.add(new String[]{"Lenovo ThinkPad X1 Carbon Gen 12", "64990", "89990", "New",
             "Intel Core Ultra 7 165H, 32GB LPDDR5X RAM, 1TB SSD, 14-inch 2.8K OLED anti-glare display, Carbon Fiber ultralight design",
             "Electronics",
-            "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80"
+            "https://i.pcmag.com/imagery/reviews/02PX9YDzfu4pBDkKQBx9jdk-21.fit_lim.size_1050x.jpg",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_quKyuLEABEz7zvFv9sJ0xG8rVXTDxTX1K4UxTSF0ukS4o_Duz7qvSQK1&s=10",
+            "https://p3-ofp.static.pub//fes/cms/2025/02/20/n77w3256bney9bkpctxegobqzh0put687141.jpg"
         });
 
         defs.add(new String[]{"ASUS ROG Zephyrus G16 Gaming Laptop", "99990", "129990", "Trending",
             "Intel Core Ultra 9 185H, NVIDIA RTX 4070 8GB, 32GB LPDDR5X, 1TB SSD, 16-inch 2.5K 240Hz OLED ROG Nebula display",
             "Electronics",
-            "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80"
+            "https://dlcdnrog.asus.com/rog/media/1774328720881.webp",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlCaNG5ijgIX3omAO3jSAUGQj9Iv1YoKV5R5eOYldcaECTcX05jfJ06uQ&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTB7RC9Iws86J_HYmZnghwTtia9A7wDdvfqlZwCUbp8EQsUbP-tdyQk0Frg&s=10"
         });
 
         defs.add(new String[]{"Acer Predator Helios 16 Gaming Laptop", "144990", "169990", "Hot Deal",
             "14th Gen Intel Core i7-14700HX, NVIDIA RTX 4070 8GB, 16GB DDR5, 1TB SSD, 16-inch WQXGA 240Hz IPS Gaming Display",
             "Electronics",
-            "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80"
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEpo_ZMS3tiXiLYoz9_HzMoV_FP365Cn-9gLbWabJAfZcMGgPzxR4IgQMc&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjYExIWAA3qnFvBmbEbfv2M5uODIqLL-uJsCmsQyfeF_-ByRx4e9UmWsU&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlg-oCgd3IAY-CgCo1KsyyHXJjm-XfFuWH_3talaYY8X7Dwxca5CvhXqQ&s=10"
         });
 
         defs.add(new String[]{"Apple MacBook Air 15 M3", "124900", "139900", "Best Seller",
             "Apple M3 chip, 16GB Unified Memory, 512GB SSD, 15.3-inch Liquid Retina display, 18-hour battery life, Midnight color",
             "Electronics",
-            "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80"
+            "https://www.notebookcheck.net/fileadmin/_processed_/b/1/csm_IMG_2772_064b8d71d6.jpg",
+            "https://www.notebookcheck.net/fileadmin/_processed_/b/1/csm_IMG_2795_7dc23a395d.jpg",
+            "https://www.notebookcheck.net/fileadmin/_processed_/7/3/csm_IMG_2789_2a7d21ddbb.jpg"
         });
 
         defs.add(new String[]{"Samsung Galaxy Book4 Pro 360", "159990", "179990", "New",
             "Intel Core Ultra 7, 16GB LPDDR5X, 1TB SSD, 16-inch 3K Dynamic AMOLED 2X 120Hz Touchscreen, S-Pen included",
             "Electronics",
-            "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=800&auto=format&fit=crop&q=80"
+            "https://images.hothardware.com/contentimages/article/3413/content/small_galaxy-book4-360-pro-open.jpg",
+            "https://m.media-amazon.com/images/I/810nJ2VHW6L._AC_UF350,350_QL80_.jpg",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQah5MwApM3bdhyLKekOX7hUthb4nY933cXIA_Biz5FM2QRQQtu8IXlSZ3O&s=10"
         });
 
         defs.add(new String[]{"MSI Stealth 16 AI Studio Laptop", "199990", "229990", "Top Rated",
             "Intel Core Ultra 9 185H, NVIDIA RTX 4080 12GB, 32GB DDR5, 2TB SSD, 16-inch UHD+ 120Hz MiniLED display, Magnesium alloy",
             "Electronics",
-            "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80"
+            "https://storage-asset.msi.com/global/picture/image/feature/nb/2023_RPLS/Stealth-16-AI-Studio-A1V/msi-stealth16-ai-ultra9-kv-laptop.png",
+            "https://i.ytimg.com/vi/pGdnyU5CQyo/sddefault.jpg",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQq-ditcF27wvXR-6d-ilL5HyERko3xU88fRLlquPNYQLdojGEK37clSD4r&s=10"
         });
 
         defs.add(new String[]{"LG Gram 17 Ultra-Light Laptop", "129990", "149990", null,
             "Intel Core Ultra 7, 16GB LPDDR5X, 1TB Gen4 SSD, 17-inch WQXGA IPS 16:10 display, 77Wh battery, ultra-lightweight 1.35kg",
             "Electronics",
-            "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1544731612-de7f96afe55f?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1544731612-de7f96afe55f?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80"
+            "https://platform.theverge.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/16389469/akrales_190619_3489_0093.jpg?quality=90&strip=all&crop=16.666666666667,0,66.666666666667,100",
+            "https://www.pcworld.com/wp-content/uploads/2025/04/lggram17hero-100818584-orig.jpg?quality=50&strip=all&w=1024",
+            "https://www.cnet.com/wp-content/uploads/sites/2/2026-gram-pro-aerominum-white_f38b74.jpg"
         });
 
         // ── 10 MOBILE PHONES ────────────────────────────────────────
         defs.add(new String[]{"Apple iPhone 15 Pro Max", "149900", "159900", "Best Seller",
             "A17 Pro chip with 6-core GPU, Titanium design with textured matte glass back, 48MP Main camera with 5x optical zoom",
             "Electronics",
-            "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&auto=format&fit=crop&q=80"
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB-oalGUBvDxudyAgPZCgckt8HpN58wapaCwxblX-KO3s803Vc7qYG-Xdg&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1dFEKqlGrgkRtOcZ2LF9HK26y8y0gzAOI9Vldq4duS1WpeatrZLIa5G0&s=10",
+            "https://i0.wp.com/thedisconnekt.com/wp-content/uploads/2024/02/Apple-iPhone-15-Pro-Max-review-26.jpg?fit=1600%2C1067&ssl=1"
         });
 
         defs.add(new String[]{"Samsung Galaxy S24 Ultra 5G", "129999", "139999", "Hot Deal",
             "Snapdragon 8 Gen 3 for Galaxy, 200MP camera with Galaxy AI feature suite, built-in S-Pen, 12GB RAM 256GB Storage",
             "Electronics",
-            "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&auto=format&fit=crop&q=80"
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqaQFXNvuJvq8AadZsi9_JojN41HJlZ7LaIEMVtrvk7Rxv0BMq5H5h2k6&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJnphKHMGO-aOJ5mcplW3ullKEEy1Pcbjn-X_GhG3cWU_6A7pb3aiX6sIm&s=10",
+            "https://refurbo.in/_next/image?url=https%3A%2F%2Frefurbo.in%2Fblogs%2Fcontent%2Fimages%2F2025%2F06%2Fsamsungs24.jpg&w=1920&q=75"
         });
 
         defs.add(new String[]{"Google Pixel 8 Pro 5G", "99999", "106999", "Top Rated",
             "Google Tensor G3 chip, 6.7-inch Super Actua 120Hz display, Pro triple rear camera with AI Magic Eraser & Best Take",
             "Electronics",
-            "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&auto=format&fit=crop&q=80"
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-Sr47Xr3k7GOLz7i7qeHW3t9nXAyO2cJwWfyLY9fZqX1z6jEBmmEK9tY&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaj5JiaRbzEdkTmBmd_seoKrXjOyiSgCFIvsRKlZp5SGT5HE_BHqfTH1g&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGJALdaj5Cyopf494ZcBl3p5EvonuesGIGT7NJT3iXx8cf048n9j6s3ejg&s=10"
         });
 
         defs.add(new String[]{"OnePlus 12 5G Smartphone", "64999", "69999", "Trending",
             "Snapdragon 8 Gen 3, 4th Gen Hasselblad Camera for Mobile, 5400mAh battery with 100W SUPERVOOC, 16GB RAM 512GB",
             "Electronics",
-            "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=800&auto=format&fit=crop&q=80"
+            "https://mc.bajajfinserv.in/media/catalog/product/o/n/oneplus12glacialwhite_base.jpeg",
+            "https://mc.bajajfinserv.in/media/catalog/product/o/n/oneplus12glacialwhite_add4.jpeg",
+            "https://media.tatacroma.com/Croma%20Assets/Communication/Mobiles/Images/306961_2_j085zm.jpg"
         });
 
         defs.add(new String[]{"Xiaomi 14 Ultra 5G", "59999", "69999", "New",
             "Leica Quad Camera System with 1-inch Sony LYT-900 sensor, Snapdragon 8 Gen 3, 90W HyperCharge, WQHD+ 120Hz AMOLED",
             "Electronics",
-            "https://images.unsplash.com/photo-1546054454-aa26e2b734c7?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1546054454-aa26e2b734c7?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1546054454-aa26e2b734c7?w=800&auto=format&fit=crop&q=80"
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqC0rtINrM3XIqcChA8wb82oJwA22R7LR84aVFeb3jl_ddYwpQG-bmzmw&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCAsftkHK0zrHe7KprYKmTqHi1WBun3IibGuN1OXknues-6MiARbukrQ9b&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf5JE9cveiyQxWVT5k4yO7Tojm5B5lvcDxgW3mPIVpjg&s=10"
         });
 
         defs.add(new String[]{"Vivo X100 Pro 5G", "39999", "46999", "Hot Deal",
             "ZEISS APO Telephoto Camera, MediaTek Dimensity 9300 chipset, Vivo V3 Imaging Chip, 5400mAh battery with 100W FlashCharge",
             "Electronics",
-            "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=800&auto=format&fit=crop&q=80"
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8C8HdLc-7UaDbNZ_3AsyFhleQyS9_clrg78Oy4u5zDQ&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1SfrA7Q5qMYYRjxVjiplq9djxGl3MkPpXFfvql_kCLA&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMOUa5xozYwBcz4sVPx8xkfwxJ87nHaGS_KwFWHeqyEYN93J4eR2rkOfg2&s=10"
         });
 
         defs.add(new String[]{"iQOO 12 5G Gaming Smartphone", "52999", "59999", "Best Seller",
             "Snapdragon 8 Gen 3, Supercomputing Chip Q1 for esports gaming, 144Hz LTPO AMOLED display, 120W FlashCharge, 16GB RAM",
             "Electronics",
-            "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=800&auto=format&fit=crop&q=80"
+            "https://akm-img-a-in.tosshub.com/indiatoday/images/story/202312/iqoo-12-190536904-1x1.png?VersionId=sc81tQndHdeMhXr7hPI_9NVrqWyguMQV",
+            "https://m.media-amazon.com/images/I/61B32CL2BCL.jpg",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHIjxMkqPZIcGPp7UTi7hxbpmtwYNqr3UrRalbt2mSyHJ2KUve5d42Uoc&s=10"
         });
 
         defs.add(new String[]{"Motorola Edge 50 Ultra 5G", "59999", "64999", "New",
             "Real Wood back casing, Snapdragon 8s Gen 3, 50MP Triple Camera with 100x AI Super Zoom, 125W TurboPower charging",
             "Electronics",
-            "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=800&auto=format&fit=crop&q=80"
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7CpVB2TOVcCMO8R-VUIYFW6k_7m54Niw_ykftFhKvui89wKEC8Htdvok&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRORrFWkb9BPtBY0poCJAEbyKN-34BTEeMhjm6v6AXe3Nrrxn3mo8aOYAM7&s=10",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSseSDd8BYsAvE6K2LOg2K4oLrIpADQjKlRxJNeRbvIOQ&s=10"
         });
 
         defs.add(new String[]{"Nothing Phone (2a) 5G", "23999", "25999", "Hot Deal",
             "Transparent Glyph Interface back design, MediaTek Dimensity 7200 Pro, 50MP Dual Camera, 120Hz flexible AMOLED display",
             "Electronics",
-            "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&auto=format&fit=crop&q=80"
+            "https://media.tatacroma.com/Croma%20Assets/Communication/Mobiles/Images/305350_0_e6efve.png",
+            "https://m.media-amazon.com/images/I/518bHtDa7YL.jpg",
+            "https://media.tatacroma.com/Croma%20Assets/Communication/Mobiles/Images/308989_0_vn8ica.png"
         });
 
         defs.add(new String[]{"Realme GT 6 5G Smartphone", "39999", "44999", null,
             "Snapdragon 8s Gen 3, 6000 nits Ultra Bright 120Hz Display, Sony LYT-808 OIS main camera, 120W SUPERVOOC charging",
             "Electronics",
-            "https://images.unsplash.com/photo-1546054454-aa26e2b734c7?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1546054454-aa26e2b734c7?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1546054454-aa26e2b734c7?w=800&auto=format&fit=crop&q=80"
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbh-Q4x_8dhUVFhjB_0_-UVSRvRX7ZfzEy76rOt_siP_Yu5ehiOuFzSS4&s=10",
+            "https://media.tatacroma.com/Croma%20Assets/Communication/Mobiles/Images/307773_2_pquu3x.png",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7sKStYZTSxcN4oWxYymzN2xsctrCRrEy0USNUGAHWHecz0XDKlD4M-Ke_&s=10"
         });
 
         // ── 5 SMART WATCHES ─────────────────────────────────────────
-        defs.add(new String[]{"Apple Watch Ultra 2 GPS + Cellular", "10000", "15500", "Top Rated",
-            "49mm Corrosion-Resistant Titanium Case, S9 SiP, Double Tap gesture control, 3000 nits display, 36-hour battery life",
+        defs.add(new String[]{"Titan Neo Analog Blue Dial Watch", "2499", "3999", "Top Rated",
+            "Premium analog wrist watch with elegant blue dial, stainless steel case, comfortable leather strap, and classic everyday design",
             "Electronics",
-            "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=800&auto=format&fit=crop&q=80"
+            "https://m.media-amazon.com/images/S/aplus-media-library-service-media/8ecc7a7d-fa58-49a6-84e5-a7fcfb33002b.__CR0,0,970,600_PT0_SX970_V1___.jpg",
+            "https://assets.myntassets.com/assets/images/2025/AUGUST/27/R8rWDxxD_26b423c27d8a4c718d9a94edfa43d863.jpg",
+            "https://assets.myntassets.com/assets/images/2025/JULY/29/vvvMbRKh_eabe0e649f9b4116b9cc9617ab431b84.jpg"
         });
 
-        defs.add(new String[]{"Samsung Galaxy Watch6 Classic 47mm", "5999", "6999", "Best Seller",
-            "Iconic Rotating Physical Bezel, BioActive Sensor for ECG & Blood Pressure, Sapphire Crystal glass, Wear OS powered by Samsung",
-            "Electronics",
-            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80"
+        defs.add(new String[]{"Fastrack Casual Black Dial Watch", "1999", "2999", "Best Seller",
+                "Stylish casual analog watch featuring a bold black dial, durable stainless steel case, water resistance, and comfortable strap",
+                "Electronics",
+                "https://assets.myntassets.com/w_412,q_50,,dpr_3,fl_progressive,f_webp/assets/images/17302598/2022/2/26/e8fa9334-8eb4-4a82-92ba-687b4ebb95e31645858103984FastrackMenBlackBrassEmbellishedDialBlackLeatherStrapsAnalog1.jpg",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_JPm3MiNt3XU8EE6rXfq6_RoV8oWFHZYx23X1W0tAr_4252NcleaoorU&s=10",
+                "https://assets.myntassets.com/w_412,q_50,,dpr_3,fl_progressive,f_webp/assets/images/9770187/2024/9/17/f6a4d204-4b6f-4f12-b7b1-8dde759797d81726564674459-Fastrack-Men-Black-Analogue-Watch-38051SM07-4191726564674336-7.jpg"
         });
 
-        defs.add(new String[]{"Garmin Fenix 7 Pro Sapphire Solar", "8990", "9990", "New",
-            "Multisport GPS smartwatch with Solar charging lens, built-in LED flashlight, endurance score, and Sapphire crystal display",
-            "Electronics",
-            "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80"
+        defs.add(new String[]{"Casio Vintage Digital Watch", "3499", "4999", "New",
+                "Classic vintage digital watch with retro design, digital display, alarm, stopwatch, calendar, and durable stainless steel band",
+                "Electronics",
+                "https://assets.myntassets.com/h_1440,q_75,w_1080/v1/assets/images/251023/2022/8/2/dc546878-8926-4201-94ee-60a54630469a1659437976605-CASIO-Men-Vintage-Silver-Dial-Men-Vintage-Watch-A-158WA-1Q---1.jpg",
+                "https://watchtopia.in/cdn/shop/files/Screenshot_2025-05-15_124939.jpg?v=1760012305",
+                "https://assets.myntassets.com/h_1440,q_75,w_1080/v1/assets/images/11094934/2022/6/20/78bfad8d-1830-47ba-b2ed-81fa3fbb4e6f1655697690284-CASIO-Vintage-Unisex-Black-Digital-Watch-D182-A168WGG-1BDF-6-1.jpg"
         });
 
-        defs.add(new String[]{"Amazfit Balance Smart Watch", "2999", "3999", "Hot Deal",
-            "Body Composition & Readiness Analysis, Dual-Band Circularly Polarized GPS, Zepp OS 3.0, 14-Day Battery Life, HD AMOLED",
-            "Electronics",
-            "https://images.unsplash.com/photo-1544117519-31a4b719223d?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1544117519-31a4b719223d?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1544117519-31a4b719223d?w=800&auto=format&fit=crop&q=80"
+        defs.add(new String[]{"Timex Expedition Classic Watch", "4299", "5999", "Hot Deal",
+                "Rugged and reliable analog watch with an easy-to-read dial, durable construction, water resistance, and classic outdoor styling",
+                "Electronics",
+                "https://shop.timexindia.com/cdn/shop/files/13065_TX_TC_25_DH_mobile_TW2Y63500.jpg?v=14394983244022575110",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAzHV2zBPTha2Gu7Ht4j1fq3_CSLawn6iuK9PGqA49BAYDWiFZvVT6n8I&s=10",
+                "https://shop.timexindia.com/cdn/shop/files/13065_TX_TC_25_PFB_desktop_TW2Y63500_1.jpg?v=1779620181"
         });
 
-        defs.add(new String[]{"Noise ColorFit Pro 5 Max Smartwatch", "4999", "7999", "Trending",
-            "1.96-inch AMOLED Display, Posture & Fall Detection alerts, Bluetooth Calling with Tru Sync, 100+ Sports Modes & Watch Faces",
-            "Electronics",
-            "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80",
-            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=800&auto=format&fit=crop&q=80"
+        defs.add(new String[]{"Fossil Grant Chronograph Watch", "7499", "9999", "Trending",
+                "Premium chronograph watch with a sophisticated dial, stainless steel construction, multiple sub-dials, and timeless classic styling",
+                "Electronics",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuSPs_ZwzNlZ0g4XvCXq_ZPUi6JzoLV6AKq24zAfDK4AxrYKhUisy2fFed&s=10",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTK7zw6y6hGtrueM9lPN-1dpGmOJMNmmKb6r8dGCvJyc1kSczGerkTtc1QF&s=10",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVs9QDoRZbcGVzaIeKyfbyv0APbhTOYrNu1rMnHKOQBnzqkqNgdjrulFg&s=10"
         });
+        
           defs.add(new String[]{"Keratin Hair Straightener", "5499", "8499", "Hot Deal",
             "Ceramic plates, adjustable temp, anti-static, auto shut-off",
             "Electronics",

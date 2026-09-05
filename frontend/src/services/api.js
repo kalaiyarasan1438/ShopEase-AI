@@ -96,14 +96,14 @@ api.interceptors.response.use(
       }
     }
 
-    // Retry logic for GET requests (up to 8 retries on network error or 5xx for Render server wake-up)
+    // Retry logic for GET requests (up to 2 retries on network error or 5xx)
     const isGetMethod = original?.method?.toLowerCase() === 'get';
-    const isNetworkOrServerError = !error.response || (error.response.status >= 500 && error.response.status < 600) || error.code === 'ECONNABORTED';
+    const isNetworkOrServerError = !error.response || (error.response.status >= 500 && error.response.status < 600);
 
     if (isGetMethod && isNetworkOrServerError) {
       original._retryCount = (original._retryCount || 0) + 1;
-      if (original._retryCount <= 8) {
-        const delay = 3000;
+      if (original._retryCount <= 2) {
+        const delay = original._retryCount * 1000;
         await new Promise((res) => setTimeout(res, delay));
         return api(original);
       }
